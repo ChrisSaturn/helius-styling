@@ -23,6 +23,7 @@ This page documents behavior that affects how OrbMarkets feels during use.
 | Refresh | Manual refresh, automatic refresh, timestamp labels, or live updates? |
 | Errors | Inline errors, toasts, full-page errors, retry actions, or fallbacks? |
 | Navigation | Does the app preserve filters, scroll position, tab state, or search context? |
+| Event monitors | How are live rows inserted, paused, filtered, marked stale, or acknowledged without disrupting table scanning? |
 
 ## Observed From `OM-001-home`
 
@@ -55,6 +56,17 @@ This page documents behavior that affects how OrbMarkets feels during use.
 | Assistant handoff | Secondary CTA offers `Go deeper with Lana` with a launch-style arrow. | Whether it opens a new route, external destination, assistant panel, or deeper modal state. |
 | Copy tone | AI action copy is concise and task-oriented. | Whether token names or risk disclaimers appear in other states. |
 
+## Prototype From `OM-PROT-001-pulse`
+
+This section documents intentional prototype behavior only; it is not production evidence.
+
+| Area | Prototype behavior | Still unresolved |
+| --- | --- | --- |
+| Live status | Header shows a compact mock-live status and update timestamp. | Real stream connection states, reconnects, stale labels, and manual pause/resume. |
+| Time windows | `5m`, `1H`, `24H`, and `7D` render as keyboard-focusable segmented buttons with `24H` active. | Persistence, URL state, backend query mapping, disabled states, and loading feedback. |
+| Event tables | Sales and listings use fixed columns, stable row heights, and inert links. | Sorting, row insertion motion, filtering, copy feedback, row click targets, and virtualization. |
+| Placeholder data | Placeholder image tiles and identifiers keep the table layout stable. | Real image loading, broken image handling, collection verification, and webhook error states. |
+
 ## Motion Guidelines
 
 Pending production validation:
@@ -64,4 +76,5 @@ Pending production validation:
 - Avoid decorative motion in dense data views.
 - Keep loading states stable so table columns and layout do not shift.
 - Keep AI request loading stable so the popup does not resize while the request is running.
+- In event monitors, insert or refresh live rows without changing column widths, row height, scroll position, or keyboard focus.
 - Respect reduced-motion preferences.

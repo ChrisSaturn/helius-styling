@@ -35,6 +35,9 @@ Each component should include:
 | Entity tab bar | Observed in `OM-005-token-detail` | Markets, History, Holders, Metadata, Social. |
 | Top markets table | Observed in `OM-005-token-detail` | Token-specific market rows with liquidity, volume, trades, unique count, and pagination. |
 | Market item row | Observed in `OM-005-token-detail` | Individual token market row from Paper node `1HQ-0`; paired logos, venue subtitle, and fixed numeric columns. |
+| Monitor KPI strip | Prototype in `OM-PROT-001-pulse` | Four compact metric cells for event-monitor summary values; not production evidence. |
+| NFT event table | Prototype in `OM-PROT-001-pulse` | Dense sales/listings tables with fixed columns, stable row heights, and future live-feed constraints. |
+| NFT identity cell | Prototype in `OM-PROT-001-pulse` | Placeholder image tile plus item and collection copy for monitor rows. |
 | Hash or address display | Pending capture | Truncation, copy action, link behavior, monospace usage. |
 | Score badge | Observed in `OM-001-home` | Hex grade badge for A/B/C market score. |
 | Status badge | Pending capture | Transaction status, validator status, risk or health states. |
@@ -172,6 +175,38 @@ Each component should include:
 - Accessibility expectations: if the row links to a market or pool detail, expose pair and venue in the link name. Logo images need useful alt text or should be hidden when redundant with text.
 - Implementation notes: do not reuse the home `Token Market Row` component directly. This row has no favorite, rank, score, or buy action, and its identity cell represents a market pair plus venue rather than a single token.
 - Production evidence: `OM-005-token-detail`, Paper node `1HQ-0`, source `https://app.paper.design/file/01KQ91NY8A16SXDG8G6QEJVM78/1-0/1HQ-0`.
+
+## Monitor KPI Strip
+
+- Purpose: summarize a live or near-live event monitor without breaking the dense table workflow.
+- Anatomy: equal-width metric cells with label, value, and optional delta/status text.
+- States: populated placeholder observed in `OM-PROT-001-pulse`; loading, stale, empty, and error states are future work.
+- Data constraints: metric values must truncate or scale within the cell without resizing neighboring cells.
+- Responsive behavior: four columns on desktop, two columns on tablet, one column on narrow mobile.
+- Accessibility expectations: expose the strip as a labelled region and keep status/delta text readable without relying only on color.
+- Implementation notes: keep the strip as one bordered band with dividers, not a grid of floating cards.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## NFT Event Table
+
+- Purpose: scan recent NFT sales or listings in a monitor view shaped for future WebSocket or webhook event streams.
+- Anatomy: table title row, fixed table columns, NFT identity cell, marketplace, price, account identifiers, signature or listing ID, and timestamp.
+- States: populated placeholder observed in `OM-PROT-001-pulse`; hover, sorting, loading, empty, error, pinned, and paused-live states remain unresolved.
+- Data constraints: item names, collection names, addresses, signatures, listing IDs, and marketplace names must truncate without changing row height or column widths.
+- Responsive behavior: preserve columns through horizontal overflow at narrow widths rather than compressing values into unreadable fragments.
+- Accessibility expectations: use real table semantics, scoped headers, visible focus, and labelled links for item, account, signature, and listing targets.
+- Implementation notes: use a fixed table layout and stable row height so future live inserts do not cause layout shift. Batch or window incoming rows before rendering high-volume live feeds.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## NFT Identity Cell
+
+- Purpose: identify the NFT event subject in a compact table row.
+- Anatomy: small square placeholder image or future NFT image, item name, and collection subtitle.
+- States: placeholder image observed in `OM-PROT-001-pulse`; real image loading, broken image, verified collection, and compressed mobile variants remain unresolved.
+- Data constraints: preserve item names before collection names. Collection subtitles can truncate first.
+- Accessibility expectations: avoid redundant image alt text when adjacent text already names the item; row links need item and collection context.
+- Implementation notes: placeholder tiles must keep a fixed footprint so image loading or missing metadata does not alter row height.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## Category Tabs
 

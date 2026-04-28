@@ -91,6 +91,7 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Live updates without layout jumps.
 - Client-rendered chart layers that may be absent from design captures.
 - Font loading and fallback behavior for dense numeric and identifier-heavy views.
+- Live event feeds that insert rows without shifting fixed monitor tables.
 
 ## Desktop Top Navigation Component Contract
 
@@ -142,6 +143,20 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Disable or busy-state the primary button during AI requests to prevent duplicate submissions.
 - Preserve concise copy. If token-specific names are injected, test long names so the centered paragraph and button stack do not overflow.
 - Treat backdrop, overlay placement, mobile presentation, streaming output, and assistant route target as unresolved until captured from production.
+
+## NFT Monitor Implementation Rules
+
+Prototype source: `OM-PROT-001-pulse`; not production evidence.
+
+- Keep monitor pages inside the shared app shell with black canvas, compact top navigation, and no marketing hero.
+- Model NFT event data with local types before integration: sale events should include collection, item name, image placeholder, marketplace, SOL/USD price, buyer, seller, signature, and timestamp; listing events should include collection, item name, image placeholder, marketplace, list price, floor delta, seller, listing ID, and timestamp.
+- Use one KPI band with equal metric cells for monitor summaries. Do not turn monitor metrics into floating cards.
+- Use fixed table layouts for sales and listings. Preserve row height, column widths, and numeric alignment during future live inserts.
+- Keep NFT identity cells fixed-size with a placeholder image tile, item name, and collection subtitle. Real image loading must not resize rows.
+- Truncate addresses, signatures, listing IDs, item names, and collection names with accessible labels that preserve the full value for assistive technology.
+- Keep placeholder Orb links inert until real account, signature, collection, and listing URL formats are confirmed.
+- At narrow widths, allow horizontal table overflow before dropping important monitor columns. Preserve NFT identity, price, identifier, and timestamp priority.
+- Future WebSocket or webhook integrations should batch updates and avoid appending rows in a way that steals focus, shifts scroll position, or reorders content unexpectedly.
 
 ## Accessibility Baseline
 

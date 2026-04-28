@@ -12,6 +12,7 @@ This page defines reusable layout models for OrbMarkets. Add patterns here only 
 | Transaction detail | Inspect one transaction | Signature display, account changes, instruction hierarchy, logs | Pending capture |
 | Account detail | Inspect wallet or program account | Ownership, balances, tokens, activity tables | Pending capture |
 | Token detail | Inspect token metadata and activity | Token identity, summary stats, KPI band, chart, section tabs, markets table | Observed in `OM-005-token-detail` |
+| NFT event monitor | Scan recent NFT sales and listings | Live-feed batching, stable KPI strip, fixed event-table columns, placeholder and stale states | Prototype in `OM-PROT-001-pulse`, not production evidence |
 | Program detail | Inspect program activity | Program authority, interactions, transaction tables | Pending capture |
 | Validator detail | Inspect validator health | Stake, performance, identity, epoch stats | Pending capture |
 | Network stats | Inspect chain-level activity | Time-series metrics, dense stat groups, refresh cadence | Pending capture |
@@ -81,3 +82,18 @@ Observed in `OM-005-token-detail`.
 - Loading and empty states: unresolved; chart and table must keep stable dimensions.
 - Error handling: unresolved; chart fetch failures need an inline no-data state that does not collapse the chart.
 - Cross-links to related pages: markets table rows likely link to market or pool detail views; exact target and nested action rules are pending live validation.
+
+## NFT Event Monitor Pattern
+
+Prototype in `OM-PROT-001-pulse`; not production evidence.
+
+- Route or URL shape: local `/pulse` prototype app.
+- Primary user intent: scan placeholder NFT sale and listing activity in a dense monitor format.
+- Information hierarchy: shared top navigation first, monitor title/status and time window second, KPI strip third, event tables fourth.
+- Header and navigation behavior: use the shared Orb-style top navigation and search-dominant shell. Do not introduce marketing copy, sidebars, or decorative backgrounds.
+- Main content grid: vertical monitor stack with one KPI band followed by separate sales and listings tables.
+- Table behavior: tables use fixed columns, stable row heights, two-line NFT identity cells, mono identifiers, and horizontal overflow on narrow widths.
+- Responsive behavior: stack header controls and KPI cells before allowing table columns to collapse. Preserve table readability through scroll.
+- Loading and empty states: future loading, empty, stale, and error states should remain inside the table frame and reserve row/table height.
+- Error handling: future stream or webhook errors need inline status that does not replace the monitor layout.
+- Cross-links to related pages: future rows should map to Orb account, signature, NFT, collection, and listing routes once route formats are confirmed.

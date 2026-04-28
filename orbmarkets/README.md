@@ -13,6 +13,7 @@ This folder is the front-end design source of truth for OrbMarkets. It starts as
 7. [Front-End Implementation](./06-frontend-implementation.md) - practical handoff notes for engineering.
 8. [Production Design Index](./production-design-index.md) - inventory of live designs reviewed from Paper MCP.
 9. [Production Design Template](./production-design-template.md) - template for documenting each captured production screen.
+10. [Pulse Prototype](./pulse.md) - intentional NFT monitor prototype guidance, not captured production evidence.
 
 ## Current Status
 
@@ -20,6 +21,7 @@ This folder is the front-end design source of truth for OrbMarkets. It starts as
 - Home market table production evidence is captured in [home.md](./home.md).
 - Token detail production evidence is captured in [token-detail.md](./token-detail.md), with the user-supplied browser screenshot filling the chart content that Paper did not fetch.
 - AI token analysis popup production evidence is captured in [ai-analysis-popup.md](./ai-analysis-popup.md).
+- Pulse NFT monitor prototype guidance is captured in [pulse.md](./pulse.md), intentionally marked as prototype-only rather than production evidence.
 - Desktop top navigation from Paper node `2-0` is promoted as a reusable component in [Components](./03-components.md).
-- Shared visual, component, page pattern, interaction, and implementation docs now include styling guidance from `OM-001-home`, `OM-005-token-detail`, and `OM-009-ai-analysis-popup`.
+- Shared visual, component, page pattern, interaction, and implementation docs now include styling guidance from `OM-001-home`, `OM-005-token-detail`, `OM-009-ai-analysis-popup`, and prototype-only monitor guidance from `OM-PROT-001-pulse`.
 - Each future Paper MCP design import should create or update one entry in `production-design-index.md`, then add a screen-specific Markdown file using `production-design-template.md`.
