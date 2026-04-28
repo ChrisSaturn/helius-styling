@@ -83,7 +83,7 @@ The token detail screen lets users inspect one asset, verify token identity, com
 
 ## Front-End Notes
 
-- Token changes: add token-detail-specific chart tokens for plot line, grid, axes, chart corner brackets, and active segment border. Reuse existing app background, muted text, subtle border, brand accent, positive, and negative status tokens.
+- Token changes: add token-detail-specific chart tokens for plot line, grid, axes, chart corner brackets, and active segment border for the main chart control. Reuse existing app background, muted text, subtle border, brand accent, positive, and negative status tokens.
 - Component changes: add reusable token detail header, summary stat grid, KPI band, time-series chart shell, chart controls, entity tab bar, and top markets table.
 - Data constraints: long token addresses must truncate with copy access; very large market cap, liquidity, FDV, and volume values must align without resizing the layout; market rows need venue names and paired token-pair logos to degrade cleanly when either logo or venue name is missing.
 - Accessibility considerations: chart controls, tabs, favorite, copy, social links, `BUY`, sort headers, rows-per-page, and pagination must be keyboard reachable and expose non-color state. The chart needs an accessible data summary or table fallback.

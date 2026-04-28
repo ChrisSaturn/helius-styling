@@ -39,3 +39,36 @@ export interface NftListingEvent {
   listingId: string;
   timestamp: string;
 }
+
+export interface PortfolioHolding {
+  id: string;
+  collection: string;
+  itemCount: number;
+  floorSol: number;
+  valueSol: number;
+  listedCount: number;
+  change24h: number;
+}
+
+export interface PortfolioActivity {
+  id: string;
+  action: 'Bought' | 'Sold' | 'Listed' | 'Received';
+  itemName: string;
+  collection: string;
+  marketplace: string;
+  valueSol: number;
+  signature: string;
+  timestamp: string;
+}
+
+export interface PortfolioProfile {
+  displayName: string;
+  wallet: string;
+  headline: string;
+  network: string;
+  signals: Array<{
+    label: string;
+    value: string;
+    status?: EventStatus;
+  }>;
+}

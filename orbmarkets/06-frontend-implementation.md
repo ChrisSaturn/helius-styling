@@ -37,11 +37,11 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Color | `color.surface.nav.utility` | Square header utility buttons and small action surfaces. |
 | Color | `color.surface.control` | Chips, segmented controls, tooltip bodies. |
 | Color | `color.border.subtle` | Table frame, dividers, inactive controls. |
-| Color | `color.border.accent` | Active segment and buy button outline. |
+| Color | `color.border.accent` | Primary action outlines, production-confirmed main active controls, and high-contrast focus treatment. |
 | Color | `color.text.primary` | Main labels and values. |
 | Color | `color.text.secondary` | Metadata, inactive tabs, secondary token names. |
 | Color | `color.text.muted` | Ranks, inactive micro labels, disabled-looking values. |
-| Color | `color.brand.orb` | Orb wordmark and orange product accent. |
+| Color | `color.brand.orb` | Orb wordmark, selected text fill, and primary product accent. |
 | Color | `color.status.positive` | Positive percentage changes and A score badge. |
 | Color | `color.status.warning` | B score badge. |
 | Color | `color.status.negative` | Negative percentage changes and C score badge. |
@@ -73,6 +73,8 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Size | `size.popup.aiAnalysis.width.compact` | 380 px AI analysis popup reference width. |
 | Size | `size.popup.aiAnalysis.height.idle` | 331 px AI analysis popup idle reference height. |
 | Size | `size.popup.aiAnalysis.header` | ~50 px AI popup header. |
+| Size | `size.popup.settings.width.compact` | ~360 px placeholder settings popup width. |
+| Size | `size.popup.settings.header` | ~50 px settings popup title and close row. |
 | Size | `size.action.ai.primary` | ~112 x 36 px `Analyze` button. |
 | Size | `size.action.assistant.cta` | ~222 x 58 px Lana secondary CTA. |
 | Radius | `radius.control.sm` | ~4-6 px buttons, chips, segmented controls. |
@@ -93,6 +95,14 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Font loading and fallback behavior for dense numeric and identifier-heavy views.
 - Live event feeds that insert rows without shifting fixed monitor tables.
 
+## Selection and Surface Rules
+
+- Secondary selected states should first use semantic state (`aria-current`, `aria-pressed`, checked state), selected text fill/color, font weight, and a quiet neutral active surface.
+- Do not use orange outlines as the default selected treatment for non-essential controls such as settings segments, density choices, secondary navigation utilities, placeholder filters, or inactive feature toggles.
+- Reserve orange outlines for primary actions such as Buy, production-confirmed main controls such as captured chart or market timeframe controls, and focus states that need stronger contrast than a neutral ring.
+- Keep visible surface hierarchy shallow. A popup, table band, KPI band, chart frame, or modal should be the visible container; rows and controls inside it should usually be separated with spacing and dividers rather than more bordered boxes.
+- Settings rows such as `Display`, `Density`, and `Network` should sit directly inside the popup shell. Choices such as `Dark` and `System` should be flat buttons or one minimal segmented group, not separate visible subcontainers.
+
 ## Desktop Top Navigation Component Contract
 
 - Compose the reusable nav from brand lockup, global search, utility actions, text nav links, network entry, and settings button.
@@ -103,13 +113,26 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Reserve accessible names for search, copy/share utility, settings, and any network selector. Mark active route or selected network semantically.
 - Treat menu panels, auth menus, search suggestions, and mobile behavior as unresolved until captured from production.
 
+## Settings Popup Component Contract
+
+Prototype source: `OM-PROT-003-settings`; not production evidence.
+
+- Open settings from the shared top-navigation icon button without changing the current page view.
+- Expose the trigger with `aria-expanded`, `aria-controls`, and `aria-haspopup="dialog"` while the popup is available.
+- Render the popup as a labelled dialog with a compact header, icon-only close button, flat control rows, and a footer close action.
+- Keep placeholder controls inert except for open and close behavior. Do not persist theme, density, network, or alert values until product rules are confirmed.
+- Use real controls for future compatibility: segmented choices should be buttons with `aria-pressed`; toggles should be checkboxes or switches with accessible labels. The selected visual treatment for these secondary controls should be selected text fill/color plus weight before accent outlines.
+- Close on Escape and when navigating between local prototype views. Future production work should add focus trap, focus return, outside-click policy, saved state, and persistence errors.
+- Keep desktop width around 360 px and use a fixed inset popup on narrow viewports. Labels must fit without resizing rows or colliding with segmented controls.
+- Use the Orb popup surface rules: black fill, subtle dividers, compact radii, one visible popup shell, and no nested card layout. Avoid wrapping each settings row or each segment choice in an additional visible box. Use red-orange only for primary emphasis, production-confirmed main active controls, or visible focus treatment.
+
 ## Home Table Implementation Rules
 
 - Prefer a fixed table layout for the home market table so live values do not resize columns.
 - Keep row height stable around the observed dense table height; hover, loading, and tooltip states must not shift rows.
 - Use text truncation for token names, not ticker symbols.
 - Use tabular numeric rendering for row metrics where the font supports it; keep price, change, market cap, and volume columns visually aligned during updates.
-- Keep the active tab and active timeframe distinguishable by shape or underline as well as color.
+- Keep the active tab and active timeframe distinguishable by selected text fill, weight, underline or semantic position as well as color. Do not copy orange outlines onto secondary filters unless production confirms the control is a main active control.
 - Render positive, warning, and negative score states with accessible labels in addition to colored badges.
 - Keep the Buy action as a compact black-filled, orange-red outline button until production confirms hover, filled, disabled, or loading variants.
 - Give icon-only row actions larger invisible hit targets while preserving the observed compact visual size.
@@ -152,16 +175,50 @@ Prototype source: `OM-PROT-001-pulse`; not production evidence.
 - Model NFT event data with local types before integration: sale events should include collection, item name, image placeholder, marketplace, SOL/USD price, buyer, seller, signature, and timestamp; listing events should include collection, item name, image placeholder, marketplace, list price, floor delta, seller, listing ID, and timestamp.
 - Use one KPI band with equal metric cells for monitor summaries. Do not turn monitor metrics into floating cards.
 - Use fixed table layouts for sales and listings. Preserve row height, column widths, and numeric alignment during future live inserts.
+- Preserve native table semantics for dense lists. Do not put `display: grid`, `display: flex`, or layout containment on `tr`, `th`, or `td`; put stacked identity, numeric, or action content inside inner wrappers.
 - Keep NFT identity cells fixed-size with a placeholder image tile, item name, and collection subtitle. Real image loading must not resize rows.
 - Truncate addresses, signatures, listing IDs, item names, and collection names with accessible labels that preserve the full value for assistive technology.
 - Keep placeholder Orb links inert until real account, signature, collection, and listing URL formats are confirmed.
 - At narrow widths, allow horizontal table overflow before dropping important monitor columns. Preserve NFT identity, price, identifier, and timestamp priority.
 - Future WebSocket or webhook integrations should batch updates and avoid appending rows in a way that steals focus, shifts scroll position, or reorders content unexpectedly.
 
+Current `/pulse` implementation alignment:
+
+- `pulse/src/App.tsx` uses local view state for the Pulse monitor and `Me` profile/portfolio, `aria-current` for the active `Me` nav state, `aria-pressed` for active timeframes, memoized sales/listing/portfolio row components, module-level SOL/USD/UTC formatters, inner numeric wrappers, and full-value labels for truncated identifiers.
+- `pulse/src/App.tsx` also includes the placeholder settings popup with open state, Escape-to-close, active trigger semantics, inert segmented controls, and a labelled toggle.
+- `pulse/src/styles.css` maps the prototype to Orb tokens with the 69 px desktop header, 61 px search rail, compact title/status header, profile summary band, 64 px monitor rows, fixed 40 px neutral NFT thumbnails, anchored settings popup, tokenized hover/focus/active states, `content-visibility` on table panels only, and reduced-motion handling.
+
+## Portfolio Implementation Rules
+
+Prototype source: `OM-PROT-002-portfolio`; not production evidence.
+
+- Keep the `Me` portfolio in the shared app shell with search-first navigation and no sidebar or marketing header.
+- Treat wallet data as placeholder until auth and route formats are confirmed. Do not infer or read local wallet data for this prototype.
+- Model portfolio data with local types before integration: metrics, collection holdings, and wallet activity should stay separate so future fetches can update independently.
+- Use the same KPI band contract as Pulse, with equal cells, stable values, and no floating metric cards.
+- Use fixed table layouts for holdings and activity. Preserve row height, collection identity width, numeric alignment, signature truncation, and timestamp formatting during future wallet refreshes.
+- Use a profile summary band for wallet identity and top signals so `Me` has a clear first-viewport identity while remaining dense and utility-first.
+- Mark `Me` as the active route semantically when the portfolio view is shown. The brand action may return to Pulse in the local prototype, but production route behavior remains unresolved.
+- Future wallet integrations need disconnected, loading, empty, hidden-wallet, stale, and indexer-error states that reserve the portfolio layout rather than collapsing the page.
+
+## Pulse React Best-Practice Notes
+
+Apply the Vercel React best-practices skill when Pulse moves beyond static prototype data:
+
+- `bundle-barrel-imports`: import table, icon, formatter, and chart helpers directly so the monitor route does not pull unrelated UI code.
+- `bundle-dynamic-imports`: defer heavy charting, stream diagnostics, or marketplace-specific panels until the user opens them or the feature is enabled.
+- `async-parallel`: fetch independent DAS metadata, marketplace context, and account labels in parallel; start requests early and await only where the UI needs the result.
+- `client-event-listeners`: keep one feed listener or subscription manager per live source, then distribute normalized events through local state rather than attaching listeners per table.
+- `rerender-memo`: memoize row components, expensive currency/relative-time formatting, and normalized identity objects once real event volume grows.
+- `rerender-dependencies`: base effects on primitive filter keys such as timeframe, marketplace, and collection address instead of whole filter objects.
+- `rerender-derived-state-no-effect`: derive active labels, empty-state flags, and status colors during render from event data instead of syncing extra state in effects.
+- `rendering-content-visibility`: use content visibility or windowing for below-fold monitor tables once row counts exceed the first viewport.
+- `js-set-map-lookups`: use `Map` or `Set` for repeated collection, account-label, signature, and listing-ID lookups during event normalization.
+
 ## Accessibility Baseline
 
 - Keyboard access for search, menus, tabs, filters, row actions, and AI popup controls.
-- Dialog keyboard support for AI popups, including focus trap, Escape, and focus return.
+- Dialog keyboard support for AI and settings popups, including focus trap, Escape, and focus return.
 - Visible focus states.
 - Color contrast that holds across status badges and secondary text.
 - Copy buttons with accessible labels.

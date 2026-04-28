@@ -56,7 +56,7 @@ The home screen is a dense market scanning surface. Users search for tokens, swi
 | Category tabs | Horizontal text tabs | `Trending` active | Active tab is white with a thin underline; inactive tabs are muted gray. |
 | Market table | Dense token ranking table | Populated | Fixed columns, row dividers, rank, favorite, token identity, metrics, score, and buy action. |
 | Token market row | Desktop dense row | SOL row | Paper node `4X-0` confirms row-level sizing, colors, and spacing for an individual token. |
-| Time-window control | Segmented control | `24H` active | Active segment uses orange outline or highlight; inactive segments remain muted. |
+| Time-window control | Segmented control | `24H` active | Captured main market control uses orange outline or highlight; inactive segments remain muted. Do not generalize this treatment to secondary utilities. |
 | Sort header | Metric header with chip | `Volume 24H` active | Sortable headers use chevrons and compact timeframe chips. |
 | Token identity cell | Logo, symbol, name | Truncated | Long token names truncate; symbols remain prominent. |
 | Sparkline | Inline trend chart | Present in supplied screenshot, incomplete in some Paper nodes | Red and green lines with faint filled area. |
@@ -78,7 +78,7 @@ The home screen is a dense market scanning surface. Users search for tokens, swi
 
 ## Front-End Notes
 
-- Token changes: add dark shell, charcoal surface, low-contrast border, orange accent, success, danger, warning, muted text, and tooltip tokens.
+- Token changes: add dark shell, charcoal surface, low-contrast border, orange accent for brand/primary/captured main controls, success, danger, warning, muted text, and tooltip tokens.
 - Component changes: prioritize reusable desktop top navigation, global search, category tabs, dense market table, token market row, segmented controls, score badges, and outline buy buttons.
 - Data constraints: token symbols must stay visible; token names can truncate; numeric columns need consistent alignment and compact formatting for large values and high precision prices.
 - Row-level sizing: node `4X-0` confirms a roughly 1336 px by 64 px desktop row, 40 px token logo, 18-20 px favorite icon, 32-40 px score badge footprint, and about 56 px by 40 px Buy button.

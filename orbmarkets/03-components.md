@@ -23,6 +23,7 @@ Each component should include:
 | App shell | Observed in `OM-001-home` | Page container plus reusable desktop top navigation placement. |
 | Desktop top navigation | Observed in `OM-001-home` | `orb` lockup, search rail, utility action, route links, network entry, settings control. |
 | Global search | Observed in `OM-001-home` | Header search with placeholder and `/` shortcut affordance; suggestions still pending. |
+| Settings popup | Prototype in `OM-PROT-003-settings` | Anchored global settings dialog with placeholder display, density, network, and alert controls; not production evidence. |
 | AI analysis popup | Observed in `OM-009-ai-analysis-popup` | Compact tool modal with red outline, centered copy, primary AI action, and Lana handoff. |
 | Primary AI action button | Observed in `OM-009-ai-analysis-popup` | Filled red `Analyze` button with AI icon and mono label. |
 | Assistant handoff CTA | Observed in `OM-009-ai-analysis-popup` | Bordered secondary CTA for `Go deeper with Lana`. |
@@ -38,6 +39,9 @@ Each component should include:
 | Monitor KPI strip | Prototype in `OM-PROT-001-pulse` | Four compact metric cells for event-monitor summary values; not production evidence. |
 | NFT event table | Prototype in `OM-PROT-001-pulse` | Dense sales/listings tables with fixed columns, stable row heights, and future live-feed constraints. |
 | NFT identity cell | Prototype in `OM-PROT-001-pulse` | Placeholder image tile plus item and collection copy for monitor rows. |
+| Profile summary band | Prototype in `OM-PROT-002-portfolio` | Bordered wallet identity and signal band under `Me`; not production evidence. |
+| Portfolio holdings table | Prototype in `OM-PROT-002-portfolio` | Dense collection exposure table under `Me`; not production evidence. |
+| Portfolio activity table | Prototype in `OM-PROT-002-portfolio` | Dense wallet activity table under `Me`; not production evidence. |
 | Hash or address display | Pending capture | Truncation, copy action, link behavior, monospace usage. |
 | Score badge | Observed in `OM-001-home` | Hex grade badge for A/B/C market score. |
 | Status badge | Pending capture | Transaction status, validator status, risk or health states. |
@@ -63,7 +67,7 @@ Each component should include:
 - States: typed search state observed in Paper node `2-0`; hover, focus, active route, disabled, menu-open, and loading/search-suggestion states pending.
 - Data constraints: search content must truncate before colliding with the trailing utility cluster; `Network` must support longer network labels or degrade into an icon/selector at narrower widths.
 - Responsive behavior: at desktop width, preserve a 69 px header height and keep search dominant. Do not wrap the nav row. Below the unresolved breakpoint, collapse secondary links before reducing search tap target quality.
-- Accessibility expectations: use a landmark `nav`, expose the search as a labeled input, give the utility/settings icon buttons accessible names, preserve visible focus rings, and mark active route/network state without relying only on color.
+- Accessibility expectations: use a landmark `nav`, expose the search as a labeled input, give the utility/settings icon buttons accessible names, preserve visible focus rings, and mark active route/network state with semantic attributes plus selected text/fill treatment instead of relying only on color.
 - Implementation notes: build this as a reusable navigation component, with global search as a child component rather than duplicating search markup per route. Keep nav links text-based and compact; use icon buttons only for utility actions.
 - Production evidence: `OM-001-home`, Paper node `2-0`, source `https://app.paper.design/file/01KQ91NY8A16SXDG8G6QEJVM78/1-0/2-0`.
 
@@ -75,6 +79,18 @@ Each component should include:
 - Data constraints: placeholder and typed values must fit inside the header without resizing the header.
 - Accessibility expectations: expose a real input, visible focus state, keyboard shortcut hint, and accessible label.
 - Production evidence: `OM-001-home`, Paper node `2-0`.
+
+## Settings Popup
+
+- Purpose: expose global product preferences without leaving the current explorer, Pulse, or portfolio context.
+- Anatomy: anchored popup shell, compact title row, icon-only close action, grouped setting rows, segmented controls, one toggle, and a small footer action.
+- Variants: placeholder open state exists in `OM-PROT-003-settings`; persisted preferences, loading, auth-gated settings, and mobile full-screen variants remain unresolved.
+- States: closed trigger, open trigger, active segment, inactive segment, checked toggle, hover, and focus states are implemented locally. Disabled and saved/error states remain unresolved.
+- Data constraints: setting labels and segment labels must truncate or fit inside the compact popup without changing row height.
+- Responsive behavior: desktop anchors to the settings icon; narrow viewports use a fixed inset popup and full-width segment groups.
+- Accessibility expectations: trigger exposes `aria-expanded`, `aria-controls`, and `aria-haspopup="dialog"`; popup renders as a labelled dialog, closes on Escape, and has a labelled close button.
+- Implementation notes: keep the popup to one visible shell with direct rows and subtle dividers, not nested cards. Do not wrap `Display`, `Density`, or `Network` rows in separate bordered containers, and do not wrap choices such as `Dark` and `System` in their own visible subcontainers. Use selected text fill/color and weight as the default selected marker for secondary settings controls. Reserve red-orange outlines for primary or production-confirmed main controls and visible focus treatment, not routine placeholder selection.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## AI Analysis Popup
 
@@ -151,7 +167,7 @@ Each component should include:
 - Purpose: switch between token-specific sections without leaving token context.
 - Anatomy: text tabs for Markets, History, Holders, Metadata, and Social.
 - States: Markets active observed; hover, focus, disabled, and loading states pending.
-- Implementation notes: active state uses white text and section position, not color alone.
+- Implementation notes: active state uses selected text fill, font weight, and section position. Do not add orange outlines to secondary tabs.
 - Production evidence: `OM-005-token-detail`, Paper node `1FI-0`.
 
 ## Top Markets Table
@@ -184,7 +200,7 @@ Each component should include:
 - Data constraints: metric values must truncate or scale within the cell without resizing neighboring cells.
 - Responsive behavior: four columns on desktop, two columns on tablet, one column on narrow mobile.
 - Accessibility expectations: expose the strip as a labelled region and keep status/delta text readable without relying only on color.
-- Implementation notes: keep the strip as one bordered band with dividers, not a grid of floating cards.
+- Implementation notes: keep the strip as one bordered band with dividers, not a grid of floating cards. The current Pulse build uses fixed minimum cell height, tabular values, and responsive 4/2/1 column behavior.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## NFT Event Table
@@ -195,7 +211,7 @@ Each component should include:
 - Data constraints: item names, collection names, addresses, signatures, listing IDs, and marketplace names must truncate without changing row height or column widths.
 - Responsive behavior: preserve columns through horizontal overflow at narrow widths rather than compressing values into unreadable fragments.
 - Accessibility expectations: use real table semantics, scoped headers, visible focus, and labelled links for item, account, signature, and listing targets.
-- Implementation notes: use a fixed table layout and stable row height so future live inserts do not cause layout shift. Batch or window incoming rows before rendering high-volume live feeds.
+- Implementation notes: use a fixed table layout and stable row height so future live inserts do not cause layout shift. The current Pulse build uses 64 px rows, fixed column widths, horizontal overflow, memoized row components, and `content-visibility` on table panels. Batch or window incoming rows before rendering high-volume live feeds.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## NFT Identity Cell
@@ -205,7 +221,49 @@ Each component should include:
 - States: placeholder image observed in `OM-PROT-001-pulse`; real image loading, broken image, verified collection, and compressed mobile variants remain unresolved.
 - Data constraints: preserve item names before collection names. Collection subtitles can truncate first.
 - Accessibility expectations: avoid redundant image alt text when adjacent text already names the item; row links need item and collection context.
-- Implementation notes: placeholder tiles must keep a fixed footprint so image loading or missing metadata does not alter row height.
+- Implementation notes: placeholder tiles must keep a fixed footprint so image loading or missing metadata does not alter row height. The current Pulse build uses a neutral 40 x 40 px tile instead of collection-tone fills, keeping strong color reserved for active controls and data status.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Table Cell Safety
+
+- Purpose: keep dense tables visually continuous and semantically correct across production and prototype lists.
+- Rule: do not apply `display: grid`, `display: flex`, `display: block`, or layout containment directly to `table`, `thead`, `tbody`, `tr`, `th`, or `td` unless replacing native table semantics intentionally.
+- Anatomy: use native table elements for structure, then place stacked content inside inner wrappers such as numeric stacks, identity cells, or action clusters.
+- Failure mode: styling a `<td>` as grid or flex can fragment row dividers, desynchronize column height, and produce broken list lines like the reference screenshot.
+- Accessibility expectations: keep real table semantics, scoped headers, and predictable cell relationships for assistive technology.
+- Implementation notes: continuous dividers, stable row height, and fixed columns must be verified in browser after table CSS changes.
+
+## Profile Summary Band
+
+- Purpose: make the `Me` profile view feel distinct without introducing marketing layout or floating cards.
+- Anatomy: one bordered full-width band with a wallet avatar tile, wallet/profile copy, accent rail, and compact signal cells.
+- States: populated placeholder observed in `OM-PROT-002-portfolio`; connected-wallet, disconnected, hidden-wallet, stale-index, and multi-wallet states remain unresolved.
+- Data constraints: wallet labels, addresses, and signal values must truncate inside their cells without resizing the band.
+- Responsive behavior: two-column band on wider viewports, stacked identity and signal rows on narrow viewports.
+- Accessibility expectations: expose the band as a labelled profile summary region and keep signal meaning in text, not color alone.
+- Implementation notes: use restrained brand accent for identity/emphasis only; keep the band inside the dense app shell.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Portfolio Holdings Table
+
+- Purpose: summarize wallet-owned collection exposure under the `Me` portfolio view.
+- Anatomy: table title row, collection identity cell, item count, floor price, portfolio value, listed count, and 24H change.
+- States: populated placeholder observed in `OM-PROT-002-portfolio`; connected-wallet, disconnected, loading, empty, hidden-wallet, and indexer-error states remain unresolved.
+- Data constraints: collection names, item counts, floor values, total values, and listed counts must not resize columns during wallet refreshes.
+- Responsive behavior: preserve horizontal overflow at narrow widths and keep collection identity, value, and 24H change readable first.
+- Accessibility expectations: use real table semantics; expose collection links with portfolio context and include non-color text for positive/negative change.
+- Implementation notes: reuse the neutral NFT identity tile and fixed 64 px table-row rhythm from the Pulse monitor. Keep stacked numeric content inside wrappers so `<td>` remains a table cell.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Portfolio Activity Table
+
+- Purpose: show recent wallet actions without leaving the `Me` portfolio context.
+- Anatomy: action badge, NFT identity cell, marketplace, SOL value, signature link, and timestamp.
+- States: populated placeholder observed in `OM-PROT-002-portfolio`; loading, empty, failed activity fetch, copied signature, and pagination states remain unresolved.
+- Data constraints: action labels should stay compact; signatures truncate visually while preserving full accessible labels and title text.
+- Responsive behavior: preserve action, NFT, value, signature, and timestamp through horizontal table overflow before dropping less-critical marketplace context.
+- Accessibility expectations: table headers must be scoped; signature links need full-value labels; timestamps need machine-readable `dateTime` values.
+- Implementation notes: keep portfolio activity visually equivalent to monitor events so wallet and live-feed tables share a common dense table contract. Keep stacked numeric content inside wrappers so `<td>` remains a table cell.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## Category Tabs
@@ -214,7 +272,7 @@ Each component should include:
 - Anatomy: text-only tabs with underline active state.
 - Variants: Watchlist, Trending, Majors, DeFi, Stocks, Commodities, Cults.
 - States: active and inactive observed; hover and focus pending.
-- Implementation notes: active state uses both color and underline, not color alone.
+- Implementation notes: active state uses selected text fill and underline, not color alone. Do not turn category tabs into outlined pills unless production confirms that treatment.
 - Production evidence: `OM-001-home`.
 
 ## Market Data Table
@@ -276,3 +334,5 @@ For every interactive component, confirm:
 - Loading.
 - Empty.
 - Error.
+
+For secondary or utility controls, selected state should prefer selected text fill/color, font weight, semantic attributes, and quiet neutral surfaces before any orange outline. Orange outlines belong to primary actions, production-confirmed main controls, or visible focus states that need extra contrast.

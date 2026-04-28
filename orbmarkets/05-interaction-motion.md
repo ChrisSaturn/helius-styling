@@ -9,6 +9,7 @@ This page documents behavior that affects how OrbMarkets feels during use.
 - Preserve context when moving between related entities.
 - Use motion only to clarify state changes.
 - Do not let animation slow down table scanning or explorer workflows.
+- For secondary selected states, prefer selected text fill/color, font weight, semantic state, and a quiet neutral surface before using an orange outline.
 
 ## Behavior To Capture
 
@@ -19,6 +20,7 @@ This page documents behavior that affects how OrbMarkets feels during use.
 | Charts | Are plots canvas or SVG, do they have hover tooltips, live updates, zooming, and keyboard-readable summaries? |
 | Copy actions | How is success communicated, and how long does feedback persist? |
 | AI analysis tools | How do AI requests start, load, complete, fail, rate-limit, and preserve token context? |
+| Settings | Which preferences exist, which persist, and how should settings, network, and notification controls validate or fail? |
 | Loading | Skeletons, spinners, optimistic placeholders, or stale-while-refresh behavior? |
 | Refresh | Manual refresh, automatic refresh, timestamp labels, or live updates? |
 | Errors | Inline errors, toasts, full-page errors, retry actions, or fallbacks? |
@@ -56,7 +58,7 @@ This page documents behavior that affects how OrbMarkets feels during use.
 | Assistant handoff | Secondary CTA offers `Go deeper with Lana` with a launch-style arrow. | Whether it opens a new route, external destination, assistant panel, or deeper modal state. |
 | Copy tone | AI action copy is concise and task-oriented. | Whether token names or risk disclaimers appear in other states. |
 
-## Prototype From `OM-PROT-001-pulse`
+## Prototype From `OM-PROT-001-pulse`, `OM-PROT-002-portfolio`, and `OM-PROT-003-settings`
 
 This section documents intentional prototype behavior only; it is not production evidence.
 
@@ -66,6 +68,17 @@ This section documents intentional prototype behavior only; it is not production
 | Time windows | `5m`, `1H`, `24H`, and `7D` render as keyboard-focusable segmented buttons with `24H` active. | Persistence, URL state, backend query mapping, disabled states, and loading feedback. |
 | Event tables | Sales and listings use fixed columns, stable row heights, and inert links. | Sorting, row insertion motion, filtering, copy feedback, row click targets, and virtualization. |
 | Placeholder data | Placeholder image tiles and identifiers keep the table layout stable. | Real image loading, broken image handling, collection verification, and webhook error states. |
+| Me portfolio | `Me` switches to a portfolio view; the brand button returns to the Pulse monitor. | URL routing, authenticated state, wallet switching, privacy states, and persistence. |
+| Settings popup | Settings opens an anchored placeholder dialog with grouped controls and closes through Escape, close, Done, route change, or brand navigation. | Real preference persistence, outside-click behavior, focus trap, focus return, saved state, and account-scoped settings. |
+
+Refined interaction direction:
+
+- Active timeframe buttons expose `aria-pressed`; selected rendering should prioritize selected text fill and weight. Use an orange inset or outline only for production-confirmed main timeframe controls, not for secondary settings or utility choices.
+- Mock-live motion is limited to the compact status dot and is disabled under reduced-motion preferences.
+- Inert NFT, account, signature, and listing links preserve full values through accessible labels and title text while rendering truncated table text.
+- The active `Me` nav state uses `aria-current="page"` and selected text/fill treatment rather than an orange outline.
+- The settings trigger exposes `aria-expanded`/`aria-controls`, renders a labelled dialog while open, and uses selected icon/text fill or quiet neutral active styling unless keyboard focus requires a stronger ring.
+- Settings segment choices such as `Dark` and `System` should behave as flat buttons in one group; avoid extra reveal motion or nested active containers for each choice.
 
 ## Motion Guidelines
 
@@ -73,6 +86,7 @@ Pending production validation:
 
 - Use short transitions for hover, focus, selection, and panel reveal.
 - Keep AI popup opening and closing quick; the interaction should feel like a lightweight tool, not a page transition.
+- Keep settings popup reveal quick and anchored; it should feel like a utility surface, not route navigation.
 - Avoid decorative motion in dense data views.
 - Keep loading states stable so table columns and layout do not shift.
 - Keep AI request loading stable so the popup does not resize while the request is running.

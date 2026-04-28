@@ -1,4 +1,11 @@
-import type { NftListingEvent, NftSaleEvent, PulseMetric } from './types';
+import type {
+  NftListingEvent,
+  NftSaleEvent,
+  PortfolioActivity,
+  PortfolioHolding,
+  PortfolioProfile,
+  PulseMetric,
+} from './types';
 
 export const timeWindows = ['5m', '1H', '24H', '7D'] as const;
 
@@ -26,6 +33,147 @@ export const pulseMetrics: PulseMetric[] = [
     value: '36',
     delta: 'tracked',
     status: 'neutral',
+  },
+];
+
+export const portfolioProfile: PortfolioProfile = {
+  displayName: 'Collector profile',
+  wallet: '9pQe7U9h4AjC7rtR6F1r',
+  headline: 'NFT exposure, listings, and wallet activity',
+  network: 'Mock wallet on Solana',
+  signals: [
+    {
+      label: 'Top collection',
+      value: 'Mad Lads',
+    },
+    {
+      label: 'Momentum',
+      value: '+5.8% 24H',
+      status: 'positive',
+    },
+    {
+      label: 'Visibility',
+      value: 'Tracked',
+      status: 'live',
+    },
+  ],
+};
+
+export const portfolioMetrics: PulseMetric[] = [
+  {
+    label: 'Portfolio value',
+    value: '184.72 SOL',
+    delta: '+5.8% 24H',
+    status: 'positive',
+  },
+  {
+    label: 'NFTs held',
+    value: '42',
+    delta: '9 collections',
+    status: 'neutral',
+  },
+  {
+    label: 'Listed',
+    value: '7',
+    delta: '16.7% of bag',
+    status: 'live',
+  },
+  {
+    label: 'Realized 24H',
+    value: '12.4 SOL',
+    delta: '+2 sales',
+    status: 'positive',
+  },
+];
+
+export const portfolioHoldings: PortfolioHolding[] = [
+  {
+    id: 'holding-01',
+    collection: 'Mad Lads',
+    itemCount: 3,
+    floorSol: 54.2,
+    valueSol: 162.6,
+    listedCount: 1,
+    change24h: 3.4,
+  },
+  {
+    id: 'holding-02',
+    collection: 'Famous Fox Federation',
+    itemCount: 4,
+    floorSol: 8.75,
+    valueSol: 35,
+    listedCount: 0,
+    change24h: 1.6,
+  },
+  {
+    id: 'holding-03',
+    collection: 'Claynosaurz',
+    itemCount: 2,
+    floorSol: 22.95,
+    valueSol: 45.9,
+    listedCount: 1,
+    change24h: -2.4,
+  },
+  {
+    id: 'holding-04',
+    collection: 'Solana Monkey Business',
+    itemCount: 1,
+    floorSol: 31.4,
+    valueSol: 31.4,
+    listedCount: 0,
+    change24h: 5.7,
+  },
+  {
+    id: 'holding-05',
+    collection: 'Tensorian Shards',
+    itemCount: 6,
+    floorSol: 3.62,
+    valueSol: 21.72,
+    listedCount: 2,
+    change24h: -0.8,
+  },
+];
+
+export const portfolioActivity: PortfolioActivity[] = [
+  {
+    id: 'portfolio-activity-01',
+    action: 'Bought',
+    itemName: 'Mad Lad #7421',
+    collection: 'Mad Lads',
+    marketplace: 'Tensor',
+    valueSol: 54.2,
+    signature: '4jQWr3ZaPortfolioPlaceholder1n7aQm',
+    timestamp: '2026-04-28T04:58:00Z',
+  },
+  {
+    id: 'portfolio-activity-02',
+    action: 'Listed',
+    itemName: 'Claynosaurz #812',
+    collection: 'Claynosaurz',
+    marketplace: 'Magic Eden',
+    valueSol: 21.8,
+    signature: '5kRt9PulsePortfolioListing2mVq4',
+    timestamp: '2026-04-28T04:50:00Z',
+  },
+  {
+    id: 'portfolio-activity-03',
+    action: 'Sold',
+    itemName: 'Fox #1846',
+    collection: 'Famous Fox Federation',
+    marketplace: 'Tensor',
+    valueSol: 8.75,
+    signature: '2qXc9PortfolioSalePlaceholder3Av7kP',
+    timestamp: '2026-04-28T04:36:00Z',
+  },
+  {
+    id: 'portfolio-activity-04',
+    action: 'Received',
+    itemName: 'Shard #0288',
+    collection: 'Tensorian Shards',
+    marketplace: 'Wallet',
+    valueSol: 3.62,
+    signature: '9pLsPortfolioTransferPlaceholder4Vn2',
+    timestamp: '2026-04-28T04:18:00Z',
   },
 ];
 

@@ -14,11 +14,11 @@ Values below are capture-derived approximations from reviewed production capture
 | Table surface | `color.surface.table` | `#000000` | Dense market table body | `OM-001-home` |
 | Control surface | `color.surface.control` | `#0b0b0b` | Time-window segments, chips, tooltip | `OM-001-home`, approximate |
 | Border | `color.border.subtle` | `#1c1c1c` | Table frame, row dividers, header/search boundary | `OM-001-home`, approximate |
-| Border active | `color.border.accent` | `#ef553f` | Active `24H` segment, buy button outline | `OM-001-home`, approximate |
+| Border active | `color.border.accent` | `#ef553f` | Primary action outlines, production-confirmed main active controls, and focus emphasis where a neutral ring is insufficient | `OM-001-home`, approximate |
 | Text primary | `color.text.primary` | `#f4f4f4` | Token symbols, prices, active labels | `OM-001-home`, approximate |
 | Text secondary | `color.text.secondary` | `#858585` | Token names, inactive tabs, metadata | `OM-001-home`, approximate |
 | Text muted | `color.text.muted` | `#5c5c5c` | Rank numbers, inactive small controls | `OM-001-home`, approximate |
-| Brand accent | `color.brand.orb` | `#ef553f` | Orb wordmark, selected outlines, primary trading accent | `OM-001-home`, approximate |
+| Brand accent | `color.brand.orb` | `#ef553f` | Orb wordmark, selected text fill, primary trading accent, and confirmed brand moments | `OM-001-home`, approximate |
 | Success | `color.status.positive` | `#4ee982` | Positive percent change, A score badge | `OM-001-home`, approximate |
 | Warning | `color.status.warning` | `#c99a22` | B score badge | `OM-001-home`, approximate |
 | Error | `color.status.negative` | `#f04455` | Negative percent change, C score badge | `OM-001-home`, approximate |
@@ -91,6 +91,7 @@ OrbMarkets should optimize for scan speed. `OM-001-home` confirms a dense market
 | Header logo rail | ~165-175 px wide | Left brand lockup reservation before the search rail | Paper node `2-0`, approximate |
 | Header search rail | ~61 px high | Dominant search surface inside the 69 px header | Paper node `2-0`, approximate |
 | Header settings control | ~36-40 px square | Final global settings button | Paper node `2-0`, approximate |
+| Settings popup | ~360 px wide, ~50 px header | Placeholder global settings utility surface | `OM-PROT-003-settings`, prototype only |
 | Table row height | ~64 px | Home market rows | Paper nodes `16-0`, `2I1-0` |
 | Token market row | ~1336 x 64 px | Desktop row component width and height | Paper node `4X-0`, approximate |
 | Row favorite action | ~20 px icon inside larger cell | Watchlist star at the start of each row | Paper node `4X-0`, approximate |
@@ -123,6 +124,17 @@ Still resolve:
 - Page gutters across full browser widths.
 - Detail panel padding on non-home screens.
 
+## Pulse Styling Refinement Notes
+
+Prototype source: `OM-PROT-001-pulse`; current Orb market-table styling reference: `https://orbmarkets.io/` and user-supplied screenshot.
+
+- Sizing: dense rows should stay close to the observed market-table cadence. Use stable dimensions for time-window buttons, KPI cells, identity thumbnails, score/status badges, and row actions before tuning visual polish.
+- Color usage: black canvas and charcoal controls remain dominant. Red-orange accent is reserved for brand moments, primary actions, production-confirmed main active controls, and focus emphasis where neutral treatment is not clear enough. Status green/red/yellow are for data meaning only.
+- Selection usage: secondary selected states should use text fill/color, font weight, semantic state, and a quiet neutral surface before using an orange outline. Avoid orange outlines on non-essential controls such as placeholder settings segments, density choices, secondary nav utilities, and inactive filter groups.
+- Highlight usage: active sort, active timeframe, keyboard focus, hover, and status deltas each need distinct treatment. Do not use a stronger fill or brighter border unless the state changes user intent, primary action priority, or data meaning.
+- Contrast: muted labels and inactive controls can be quiet, but row-critical values, identifiers, and selected states must remain readable at table-scanning distance.
+- Current Pulse implementation alignment target: compact title/status header, profile summary band for `Me`, 64 px monitor rows, fixed neutral NFT thumbnails, anchored settings popup, tokenized hover states, selected text fill for secondary controls, and red-orange reserved for main active controls, primary action emphasis, profile emphasis, and focus treatment.
+
 ## Surfaces
 
 Track how the product separates content:
@@ -134,10 +146,19 @@ Track how the product separates content:
 - Market item surface: token detail market rows use the same black row and subtle divider model, but the identity cell uses overlapping pair logos and a muted venue subtitle instead of rank, favorite, score, or buy controls.
 - Token detail surface: header, stat grid, KPI band, chart, tabs, and markets table remain part of one dense black analysis page rather than independent cards.
 - Chart surface: a reserved black plot area with subtle grid lines, right-side y-axis text, bottom time labels, active timeframe border, and red corner brackets.
-- Inline controls: segmented timeframe controls and compact chips use subtle charcoal fills and borders.
+- Inline controls: segmented timeframe controls and compact chips use subtle charcoal fills and borders. On secondary controls, selected state should start with selected text fill/color and weight; do not add orange outlines by default.
 - Tooltip surface: black or near-black popover with thin border and compact text.
 - Modal popup surface: `OM-009-ai-analysis-popup` confirms a compact black tool popup with a red accent stroke, low-contrast header divider, centered content, and a bordered secondary CTA.
+- Settings popup surface: `OM-PROT-003-settings` should use the same black utility surface language with flat grouped rows, subtle dividers, compact segmented controls, and selected text fill rather than orange outlines on secondary choices. This is prototype guidance, not production evidence.
 - Detail panels, drawers, and menus remain pending production evidence.
+
+## Surface Composition Rules
+
+- Use one visible surface per functional region: app shell, table band, modal, popup, chart frame, or KPI band.
+- Prefer spacing, alignment, and subtle dividers over nested visible containers.
+- In settings popups, place labels such as `Display`, `Density`, and `Network` directly on rows inside the popup shell. Do not wrap each row in its own bordered card.
+- Segment choices such as `Dark` and `System` should sit inside one minimal control group or render as flat text buttons. Do not wrap each choice in an additional visible subcontainer.
+- Inner wrappers are allowed for layout, truncation, hit targets, or accessibility, but they should not introduce extra borders, fills, or shadows unless the wrapper has a distinct semantic purpose.
 
 ## Icons
 
