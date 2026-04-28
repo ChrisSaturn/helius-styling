@@ -15,7 +15,7 @@ Values below are capture-derived approximations from reviewed production capture
 | Control surface | `color.surface.control` | `#0b0b0b` | Time-window segments, chips, tooltip | `OM-001-home`, approximate |
 | Border | `color.border.subtle` | `#1c1c1c` | Table frame, row dividers, header/search boundary | `OM-001-home`, approximate |
 | Border active | `color.border.accent` | `#ef553f` | Primary action outlines, production-confirmed main active controls, and focus emphasis where a neutral ring is insufficient | `OM-001-home`, approximate |
-| Text primary | `color.text.primary` | `#f4f4f4` | Token symbols, prices, active labels | `OM-001-home`, approximate |
+| Text primary | `color.text.primary` | `#f4f4f4` | Token symbols, prices, active labels, collection names, and main clickable labels | `OM-001-home`, approximate |
 | Text secondary | `color.text.secondary` | `#858585` | Token names, inactive tabs, metadata | `OM-001-home`, approximate |
 | Text muted | `color.text.muted` | `#5c5c5c` | Rank numbers, inactive small controls | `OM-001-home`, approximate |
 | Brand accent | `color.brand.orb` | `#ef553f` | Orb wordmark, selected text fill, primary trading accent, and confirmed brand moments | `OM-001-home`, approximate |
@@ -91,6 +91,10 @@ OrbMarkets should optimize for scan speed. `OM-001-home` confirms a dense market
 | Header logo rail | ~165-175 px wide | Left brand lockup reservation before the search rail | Paper node `2-0`, approximate |
 | Header search rail | ~61 px high | Dominant search surface inside the 69 px header | Paper node `2-0`, approximate |
 | Header settings control | ~36-40 px square | Final global settings button | Paper node `2-0`, approximate |
+| Site max width | 1480 px outer shell | Shared header and page rail for local prototypes | `OM-PROT-001-pulse`, prototype only |
+| Site horizontal gutter, desktop | 18 px | Shared inline page/header spacing at desktop widths | `OM-PROT-001-pulse`, prototype only |
+| Site horizontal gutter, tablet | 14 px | Shared inline page/header spacing below 980 px | `OM-PROT-001-pulse`, prototype only |
+| Site horizontal gutter, mobile | 12 px | Shared inline page/header spacing below 640 px | `OM-PROT-001-pulse`, prototype only |
 | Settings popup | ~360 px wide, ~50 px header | Placeholder global settings utility surface | `OM-PROT-003-settings`, prototype only |
 | Table row height | ~64 px | Home market rows | Paper nodes `16-0`, `2I1-0` |
 | Token market row | ~1336 x 64 px | Desktop row component width and height | Paper node `4X-0`, approximate |
@@ -129,7 +133,9 @@ Still resolve:
 Prototype source: `OM-PROT-001-pulse`; current Orb market-table styling reference: `https://orbmarkets.io/` and user-supplied screenshot.
 
 - Sizing: dense rows should stay close to the observed market-table cadence. Use stable dimensions for time-window buttons, KPI cells, identity thumbnails, score/status badges, and row actions before tuning visual polish.
+- Horizontal spacing: prototypes use one shared site rail: 1480 px max shell, 18 px desktop gutter, 14 px tablet gutter, and 12 px mobile gutter. Header content, page content, profile bands, KPI bands, and table panels must align to this rail rather than each declaring separate inline padding.
 - Color usage: black canvas and charcoal controls remain dominant. Red-orange accent is reserved for brand moments, primary actions, production-confirmed main active controls, and focus emphasis where neutral treatment is not clear enough. Status green/red/yellow are for data meaning only.
+- Text hierarchy: collection names and main clickable labels use the White or primary text role, `color.text.primary`, even inside dense two-line identity cells. Reserve secondary and muted roles for supporting metadata such as venues, marketplaces, account labels, timestamps, inactive controls, and non-primary subtitles.
 - Selection usage: secondary selected states should use text fill/color, font weight, semantic state, and a quiet neutral surface before using an orange outline. Avoid orange outlines on non-essential controls such as placeholder settings segments, density choices, secondary nav utilities, and inactive filter groups.
 - Highlight usage: active sort, active timeframe, keyboard focus, hover, and status deltas each need distinct treatment. Do not use a stronger fill or brighter border unless the state changes user intent, primary action priority, or data meaning.
 - Contrast: muted labels and inactive controls can be quiet, but row-critical values, identifiers, and selected states must remain readable at table-scanning distance.
@@ -176,6 +182,8 @@ Observed icon style from `OM-001-home`:
 | AI analysis icon | ~18-24 px | Filled or compact pictogram | Brand accent or white | Modal title and primary AI action |
 | Modal close icon | ~18-20 px | Thin line | Secondary text | Dismiss AI popup |
 | Assistant CTA icons | ~18-24 px | Directional mark plus launch arrow | Primary text or muted text | `Go deeper with Lana` handoff |
+| Prototype Lucide utility icons | 12-18 px | Thin line, inherited stroke | Muted text by default, brand fill for selected or high-signal states | `OM-PROT-001-pulse`, nav, settings, table headers, metric cells, address links, timestamps |
+| Prototype section icon tiles | 28-32 px tile | Thin line inside subtle bordered tile | Brand text fill on neutral surface | `OM-PROT-001-pulse`, page titles and metric cells |
 
 For front-end consistency, each future icon entry should define:
 
@@ -185,3 +193,10 @@ For front-end consistency, each future icon entry should define:
 - Color role.
 - Hover and active behavior.
 - Associated action or semantic meaning.
+
+Prototype implementation notes:
+
+- Use `lucide-react` for reusable interface icons in the local React prototype.
+- Keep icons decorative when adjacent text already names the action or value; expose accessible names on the parent button/link instead.
+- Use 12-13 px icons inside dense table cells and metadata, 15-18 px icons inside nav/buttons, and 28-32 px tiles only for page-title or metric emphasis.
+- Do not introduce icon-only meaning for data status. Positive, negative, live, and selected states still need text or semantic state.

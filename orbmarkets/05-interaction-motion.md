@@ -10,6 +10,7 @@ This page documents behavior that affects how OrbMarkets feels during use.
 - Use motion only to clarify state changes.
 - Do not let animation slow down table scanning or explorer workflows.
 - For secondary selected states, prefer selected text fill/color, font weight, semantic state, and a quiet neutral surface before using an orange outline.
+- Make collection names and main clickables visually immediate with the White or primary text role; secondary metadata links can stay muted only when they are not the row's primary action.
 
 ## Behavior To Capture
 
@@ -64,18 +65,20 @@ This section documents intentional prototype behavior only; it is not production
 
 | Area | Prototype behavior | Still unresolved |
 | --- | --- | --- |
-| Live status | Header shows a compact mock-live status and update timestamp. | Real stream connection states, reconnects, stale labels, and manual pause/resume. |
+| Live status | Header shows a compact mock-live status and update timestamp that refreshes from the local mock feed. | Real stream connection states, reconnects, stale labels, and manual pause/resume. |
 | Time windows | `5m`, `1H`, `24H`, and `7D` render as keyboard-focusable segmented buttons with `24H` active. | Persistence, URL state, backend query mapping, disabled states, and loading feedback. |
-| Event tables | Sales and listings use fixed columns, stable row heights, and inert links. | Sorting, row insertion motion, filtering, copy feedback, row click targets, and virtualization. |
-| Placeholder data | Placeholder image tiles and identifiers keep the table layout stable. | Real image loading, broken image handling, collection verification, and webhook error states. |
+| Event tables | Sales and listings use fixed columns, stable row heights, capped visible latest rows, and inert links. | Sorting, row insertion motion, filtering, copy feedback, row click targets, and virtualization. |
+| Placeholder data | Placeholder image tiles, identifiers, and generated sale/listing rows keep the table layout stable while exercising live-update behavior. | Real image loading, broken image handling, collection verification, and webhook error states. |
 | Me portfolio | `Me` switches to a portfolio view; the brand button returns to the Pulse monitor. | URL routing, authenticated state, wallet switching, privacy states, and persistence. |
 | Settings popup | Settings opens an anchored placeholder dialog with grouped controls and closes through Escape, close, Done, route change, or brand navigation. | Real preference persistence, outside-click behavior, focus trap, focus return, saved state, and account-scoped settings. |
 
 Refined interaction direction:
 
 - Active timeframe buttons expose `aria-pressed`; selected rendering should prioritize selected text fill and weight. Use an orange inset or outline only for production-confirmed main timeframe controls, not for secondary settings or utility choices.
-- Mock-live motion is limited to the compact status dot and is disabled under reduced-motion preferences.
+- Mock-live treatment is limited to the compact status pill and timestamp; avoid decorative motion in the monitor header.
+- Mock-feed updates should use one timed source, functional state updates, capped visible rows, and derived metrics. They should not steal focus, resize the tables, or imply real stream connectivity.
 - Inert NFT, account, signature, and listing links preserve full values through accessible labels and title text while rendering truncated table text.
+- Collection names and main row clickables should stay in the White or primary text role even when the link is inert in the prototype; muted text is for supporting identifiers and metadata.
 - The active `Me` nav state uses `aria-current="page"` and selected text/fill treatment rather than an orange outline.
 - The settings trigger exposes `aria-expanded`/`aria-controls`, renders a labelled dialog while open, and uses selected icon/text fill or quiet neutral active styling unless keyboard focus requires a stronger ring.
 - Settings segment choices such as `Dark` and `System` should behave as flat buttons in one group; avoid extra reveal motion or nested active containers for each choice.

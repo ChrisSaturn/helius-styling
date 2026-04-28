@@ -7,6 +7,13 @@ export interface PulseMetric {
   status?: EventStatus;
 }
 
+export interface PulseFeedSnapshot {
+  sales: NftSaleEvent[];
+  listings: NftListingEvent[];
+  updatedAt: string;
+  sequence: number;
+}
+
 export interface NftIdentityPlaceholder {
   initials: string;
   tone: 'ember' | 'teal' | 'violet' | 'amber' | 'steel' | 'rose';

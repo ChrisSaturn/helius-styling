@@ -38,7 +38,7 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Color | `color.surface.control` | Chips, segmented controls, tooltip bodies. |
 | Color | `color.border.subtle` | Table frame, dividers, inactive controls. |
 | Color | `color.border.accent` | Primary action outlines, production-confirmed main active controls, and high-contrast focus treatment. |
-| Color | `color.text.primary` | Main labels and values. |
+| Color | `color.text.primary` | Main labels, values, collection names, and primary clickable labels. |
 | Color | `color.text.secondary` | Metadata, inactive tabs, secondary token names. |
 | Color | `color.text.muted` | Ranks, inactive micro labels, disabled-looking values. |
 | Color | `color.brand.orb` | Orb wordmark, selected text fill, and primary product accent. |
@@ -56,6 +56,10 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Size | `size.header.searchRail` | ~61 px search rail height inside the desktop header. |
 | Size | `size.header.settingsControl` | ~36-40 px square settings button. |
 | Layout | `layout.header.logoRail` | ~165-175 px reserved desktop brand area before search. |
+| Layout | `layout.site.maxWidth` | 1480 px shared app shell for local prototypes. |
+| Layout | `layout.site.gutter.desktop` | 18 px shared horizontal gutter for desktop header and page content. |
+| Layout | `layout.site.gutter.tablet` | 14 px shared horizontal gutter below 980 px. |
+| Layout | `layout.site.gutter.mobile` | 12 px shared horizontal gutter below 640 px. |
 | Size | `size.table.row.dense` | ~64 px market table row. |
 | Size | `size.table.row.width.desktop` | ~1336 px observed desktop table row. |
 | Size | `size.table.row.marketItem` | ~50-56 px token detail market item row. |
@@ -90,25 +94,42 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Failed, pending, and partially decoded transactions.
 - Tables with many columns.
 - Mobile layouts for dense data.
-- Live updates without layout jumps.
+- Live updates without layout jumps, including mock-refresh snapshots used before real streams exist.
 - Client-rendered chart layers that may be absent from design captures.
 - Font loading and fallback behavior for dense numeric and identifier-heavy views.
-- Live event feeds that insert rows without shifting fixed monitor tables.
+- Live event feeds, including local mock-feed substitutes, that insert rows without shifting fixed monitor tables.
 
 ## Selection and Surface Rules
 
 - Secondary selected states should first use semantic state (`aria-current`, `aria-pressed`, checked state), selected text fill/color, font weight, and a quiet neutral active surface.
 - Do not use orange outlines as the default selected treatment for non-essential controls such as settings segments, density choices, secondary navigation utilities, placeholder filters, or inactive feature toggles.
 - Reserve orange outlines for primary actions such as Buy, production-confirmed main controls such as captured chart or market timeframe controls, and focus states that need stronger contrast than a neutral ring.
+- Render collection names, primary row drill-down labels, and main clickable text in `color.text.primary`/White. Use `color.text.secondary` or `color.text.muted` for supporting metadata only, such as marketplaces, venues, timestamps, inactive utility controls, and non-primary identifiers.
 - Keep visible surface hierarchy shallow. A popup, table band, KPI band, chart frame, or modal should be the visible container; rows and controls inside it should usually be separated with spacing and dividers rather than more bordered boxes.
 - Settings rows such as `Display`, `Density`, and `Network` should sit directly inside the popup shell. Choices such as `Dark` and `System` should be flat buttons or one minimal segmented group, not separate visible subcontainers.
+
+## Site Spacing Contract
+
+- Use one site-wide horizontal rail for app chrome and page content. In CSS this should be tokenized as `--layout-site-max`, `--layout-page-gutter`, and `--layout-page-rail`.
+- Desktop prototypes use a 1480 px max shell and 18 px inline gutter. Tablet and mobile reduce only the gutter, to 14 px below 980 px and 12 px below 640 px.
+- Top navigation and main content must align on the same left and right rail. Do not let the header use a different hardcoded inline padding than the page body.
+- Full-width bands such as profile summary, KPI strip, and table panels should fill the rail. Internal cell padding can vary by component, but the outer left/right edge must remain aligned.
+- Settings popups on narrow viewports should inset from the same mobile gutter instead of introducing a separate 10 px fixed offset.
+
+## Icon Implementation Contract
+
+- Use `lucide-react` for shared React prototype icons instead of local one-off SVG components.
+- Prefer static named imports for icons used in the route; avoid dynamic icon registries for common UI icons because they can pull more code than the route needs.
+- Icons next to visible text are decorative and should use `aria-hidden="true"`. Keep accessible names on the parent button, link, input, or region.
+- Keep icon dimensions stable: 12-13 px in dense cells and metadata, 15-18 px in buttons/nav, and 28-32 px only for page-title or metric icon tiles.
+- Icon color follows the text hierarchy: muted by default, primary on hover where text also brightens, and brand fill for selected or high-signal states.
 
 ## Desktop Top Navigation Component Contract
 
 - Compose the reusable nav from brand lockup, global search, utility actions, text nav links, network entry, and settings button.
 - Keep the component route-agnostic. Active route, network label, auth state, and search value should be props or state inputs, not hardcoded per page.
 - Render the search as a real input and keep it dominant at desktop width. The trailing utility icon and `/` affordance stay inside the search rail.
-- Preserve the 69 px desktop header height and stable horizontal rhythm. Avoid wrapping; collapse secondary links at narrower widths once responsive behavior is confirmed.
+- Preserve the 69 px desktop header height and stable horizontal rhythm on the shared site rail. Avoid wrapping; collapse secondary links at narrower widths once responsive behavior is confirmed.
 - Use compact icon buttons for non-text utility actions. `Me` and `Network` remain text entries in the observed desktop state.
 - Reserve accessible names for search, copy/share utility, settings, and any network selector. Mark active route or selected network semantically.
 - Treat menu panels, auth menus, search suggestions, and mobile behavior as unresolved until captured from production.
@@ -173,10 +194,13 @@ Prototype source: `OM-PROT-001-pulse`; not production evidence.
 
 - Keep monitor pages inside the shared app shell with black canvas, compact top navigation, and no marketing hero.
 - Model NFT event data with local types before integration: sale events should include collection, item name, image placeholder, marketplace, SOL/USD price, buyer, seller, signature, and timestamp; listing events should include collection, item name, image placeholder, marketplace, list price, floor delta, seller, listing ID, and timestamp.
+- Until Helius or marketplace integrations exist, seed Pulse from local placeholder rows and update a capped mock-feed snapshot on one interval. Generated mock rows should exercise latest sales, latest listings, updated timestamp, and derived KPI behavior without implying production stream health.
 - Use one KPI band with equal metric cells for monitor summaries. Do not turn monitor metrics into floating cards.
+- Derive monitor KPI values from the current event snapshot where practical: floor from listing prices/deltas, sales volume from visible sales, listing count from a mock aggregate, and active collections from visible event rows.
 - Use fixed table layouts for sales and listings. Preserve row height, column widths, and numeric alignment during future live inserts.
 - Preserve native table semantics for dense lists. Do not put `display: grid`, `display: flex`, or layout containment on `tr`, `th`, or `td`; put stacked identity, numeric, or action content inside inner wrappers.
 - Keep NFT identity cells fixed-size with a placeholder image tile, item name, and collection subtitle. Real image loading must not resize rows.
+- Render collection names and the main item or row links in `color.text.primary`/White. Supporting account, signature, listing, marketplace, and timestamp metadata can use secondary or muted text.
 - Truncate addresses, signatures, listing IDs, item names, and collection names with accessible labels that preserve the full value for assistive technology.
 - Keep placeholder Orb links inert until real account, signature, collection, and listing URL formats are confirmed.
 - At narrow widths, allow horizontal table overflow before dropping important monitor columns. Preserve NFT identity, price, identifier, and timestamp priority.
@@ -184,9 +208,11 @@ Prototype source: `OM-PROT-001-pulse`; not production evidence.
 
 Current `/pulse` implementation alignment:
 
-- `pulse/src/App.tsx` uses local view state for the Pulse monitor and `Me` profile/portfolio, `aria-current` for the active `Me` nav state, `aria-pressed` for active timeframes, memoized sales/listing/portfolio row components, module-level SOL/USD/UTC formatters, inner numeric wrappers, and full-value labels for truncated identifiers.
+- `pulse/src/App.tsx` uses local view state for the Pulse monitor and `Me` profile/portfolio, local Pulse feed state seeded from placeholder rows, one mock-refresh interval with functional state updates, derived Pulse KPI metrics, `aria-current` for the active `Me` nav state, `aria-pressed` for active timeframes, static Lucide icon imports, memoized navigation/settings/timeframe and sales/listing/portfolio row components, module-level SOL/USD/UTC formatters, inner numeric wrappers, and full-value labels for truncated identifiers.
 - `pulse/src/App.tsx` also includes the placeholder settings popup with open state, Escape-to-close, active trigger semantics, inert segmented controls, and a labelled toggle.
-- `pulse/src/styles.css` maps the prototype to Orb tokens with the 69 px desktop header, 61 px search rail, compact title/status header, profile summary band, 64 px monitor rows, fixed 40 px neutral NFT thumbnails, anchored settings popup, tokenized hover/focus/active states, `content-visibility` on table panels only, and reduced-motion handling.
+- `pulse/index.html` links the Pulse favicon set from `/winniepoo-mert/favicon_io/`; Vite serves the copied bundle from `pulse/public/winniepoo-mert/favicon_io`, including the `.ico`, PNG sizes, Apple touch icon, and manifest with Pulse app names and black theme/background colors.
+- `pulse/src/pulseData.ts` owns the mock feed boundary through `createInitialPulseFeed`, `createNextPulseFeed`, `buildPulseMetrics`, deterministic generated row factories, a fixed visible-row cap, and the 4.5 second refresh constant so future stream normalization can replace the mock generator without rewriting row components.
+- `pulse/src/styles.css` maps the prototype to Orb tokens with the 1480 px shared shell, 18/14/12 px responsive gutters, 69 px desktop header, 61 px search rail, compact title/status header, profile summary band, 64 px monitor rows, fixed 40 px neutral NFT thumbnails, anchored settings popup, tokenized hover/focus/active states, `content-visibility` on table panels only, and reduced-motion handling.
 
 ## Portfolio Implementation Rules
 
@@ -197,6 +223,7 @@ Prototype source: `OM-PROT-002-portfolio`; not production evidence.
 - Model portfolio data with local types before integration: metrics, collection holdings, and wallet activity should stay separate so future fetches can update independently.
 - Use the same KPI band contract as Pulse, with equal cells, stable values, and no floating metric cards.
 - Use fixed table layouts for holdings and activity. Preserve row height, collection identity width, numeric alignment, signature truncation, and timestamp formatting during future wallet refreshes.
+- Render collection names and primary collection links in `color.text.primary`/White across holdings and activity tables. Do not use muted gray for the main portfolio drill-down target.
 - Use a profile summary band for wallet identity and top signals so `Me` has a clear first-viewport identity while remaining dense and utility-first.
 - Mark `Me` as the active route semantically when the portfolio view is shown. The brand action may return to Pulse in the local prototype, but production route behavior remains unresolved.
 - Future wallet integrations need disconnected, loading, empty, hidden-wallet, stale, and indexer-error states that reserve the portfolio layout rather than collapsing the page.
@@ -206,10 +233,12 @@ Prototype source: `OM-PROT-002-portfolio`; not production evidence.
 Apply the Vercel React best-practices skill when Pulse moves beyond static prototype data:
 
 - `bundle-barrel-imports`: import table, icon, formatter, and chart helpers directly so the monitor route does not pull unrelated UI code.
+- `bundle-conditional`: keep future heavy marketplace, charting, or diagnostics icon sets out of the initial monitor route until their panels are opened.
 - `bundle-dynamic-imports`: defer heavy charting, stream diagnostics, or marketplace-specific panels until the user opens them or the feature is enabled.
 - `async-parallel`: fetch independent DAS metadata, marketplace context, and account labels in parallel; start requests early and await only where the UI needs the result.
 - `client-event-listeners`: keep one feed listener or subscription manager per live source, then distribute normalized events through local state rather than attaching listeners per table.
 - `rerender-memo`: memoize row components, expensive currency/relative-time formatting, and normalized identity objects once real event volume grows.
+- `rerender-functional-setstate`: use functional state updates for mock or real feed inserts so interval/listener callbacks do not depend on stale snapshots.
 - `rerender-dependencies`: base effects on primitive filter keys such as timeframe, marketplace, and collection address instead of whole filter objects.
 - `rerender-derived-state-no-effect`: derive active labels, empty-state flags, and status colors during render from event data instead of syncing extra state in effects.
 - `rendering-content-visibility`: use content visibility or windowing for below-fold monitor tables once row counts exceed the first viewport.

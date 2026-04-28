@@ -13,7 +13,7 @@ This page defines reusable layout models for OrbMarkets. Add patterns here only 
 | Transaction detail | Inspect one transaction | Signature display, account changes, instruction hierarchy, logs | Pending capture |
 | Account detail | Inspect wallet or program account | Ownership, balances, tokens, activity tables | Pending capture |
 | Token detail | Inspect token metadata and activity | Token identity, summary stats, KPI band, chart, section tabs, markets table | Observed in `OM-005-token-detail` |
-| NFT event monitor | Scan recent NFT sales and listings | Live-feed batching, stable KPI strip, fixed event-table columns, placeholder and stale states | Prototype in `OM-PROT-001-pulse`, not production evidence |
+| NFT event monitor | Scan recent NFT sales and listings | Live-feed batching, mock-feed refresh, stable KPI strip, fixed event-table columns, placeholder and stale states | Prototype in `OM-PROT-001-pulse`, not production evidence |
 | Wallet portfolio | Inspect owned NFT exposure and account activity | Auth state, wallet identifier, portfolio KPI strip, holdings table, activity table, sensitive-data boundaries | Prototype in `OM-PROT-002-portfolio`, not production evidence |
 | Program detail | Inspect program activity | Program authority, interactions, transaction tables | Pending capture |
 | Validator detail | Inspect validator health | Stake, performance, identity, epoch stats | Pending capture |
@@ -107,8 +107,9 @@ Prototype in `OM-PROT-001-pulse`; not production evidence.
 - Primary user intent: scan placeholder NFT sale and listing activity in a dense monitor format.
 - Information hierarchy: shared top navigation first, monitor title/status and time window second, KPI strip third, event tables fourth.
 - Header and navigation behavior: use the shared Orb-style top navigation and search-dominant shell. Do not introduce marketing copy, sidebars, or decorative backgrounds.
-- Main content grid: vertical monitor stack with one KPI band followed by separate sales and listings tables.
-- Table behavior: tables use fixed columns, stable row heights, two-line NFT identity cells, mono identifiers, and horizontal overflow on narrow widths.
+- Main content grid: vertical monitor stack with one KPI band followed by separate latest sales and latest listings tables. The top navigation, page header, KPI band, and table panels align to one shared 1480 px site rail with responsive 18/14/12 px gutters.
+- Table behavior: tables use fixed columns, stable row heights, two-line NFT identity cells, mono identifiers, capped visible mock rows, and horizontal overflow on narrow widths. Collection names and main row clickables render in the White or primary text role, not muted metadata gray.
+- Mock-feed behavior: local prototype rows seed from static placeholders, then a single interval inserts generated sale/listing rows, updates the monitor timestamp, and recalculates KPI strip values from the current visible snapshot. This behavior is a substitute for future Helius stream/webhook data, not production evidence.
 - Responsive behavior: stack header controls and KPI cells before allowing table columns to collapse. Preserve table readability through scroll.
 - Loading and empty states: future loading, empty, stale, and error states should remain inside the table frame and reserve row/table height.
 - Error handling: future stream or webhook errors need inline status that does not replace the monitor layout.
@@ -122,8 +123,8 @@ Prototype in `OM-PROT-002-portfolio`; not production evidence.
 - Primary user intent: inspect wallet-level NFT exposure, listed inventory, realized activity, and recent portfolio events.
 - Information hierarchy: shared top navigation first, `Profile` title and wallet context second, time-window control third, profile summary band fourth, KPI strip fifth, holdings and activity tables sixth.
 - Header and navigation behavior: `Me` becomes the active compact nav control; the `orb` brand button returns to the Pulse monitor view in the current prototype until route formats are confirmed.
-- Main content grid: one profile summary band, one portfolio KPI band, then full-width holdings and recent activity tables.
-- Table behavior: holdings rows use collection identity, item count, floor, value, listed count, and 24H change; activity rows use action, NFT identity, marketplace, value, signature, and time.
+- Main content grid: one profile summary band, one portfolio KPI band, then full-width holdings and recent activity tables. All outer surfaces align to the shared site rail used by Pulse.
+- Table behavior: holdings rows use collection identity, item count, floor, value, listed count, and 24H change; activity rows use action, NFT identity, marketplace, value, signature, and time. Collection names and primary collection links should use the White or primary text role.
 - Responsive behavior: preserve the KPI strip stacking and horizontal table overflow behavior used by the Pulse monitor.
 - Loading and empty states: unresolved; future wallet loading, disconnected, empty-wallet, hidden-wallet, and indexer-error states should reserve the KPI and table regions.
 - Error handling: unresolved; auth or wallet-indexing errors should be inline within the portfolio surface and should not replace global navigation.

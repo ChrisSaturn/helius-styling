@@ -4,37 +4,11 @@ import type {
   PortfolioActivity,
   PortfolioHolding,
   PortfolioProfile,
+  PulseFeedSnapshot,
   PulseMetric,
 } from './types';
 
 export const timeWindows = ['5m', '1H', '24H', '7D'] as const;
-
-export const pulseMetrics: PulseMetric[] = [
-  {
-    label: 'Floor',
-    value: '12.82 SOL',
-    delta: '+3.4%',
-    status: 'positive',
-  },
-  {
-    label: 'Sales volume',
-    value: '482.6 SOL',
-    delta: '24H mock',
-    status: 'live',
-  },
-  {
-    label: 'Listings',
-    value: '1,248',
-    delta: '-2.1%',
-    status: 'negative',
-  },
-  {
-    label: 'Active collections',
-    value: '36',
-    delta: 'tracked',
-    status: 'neutral',
-  },
-];
 
 export const portfolioProfile: PortfolioProfile = {
   displayName: 'Collector profile',
@@ -312,3 +286,264 @@ export const latestListings: NftListingEvent[] = [
     timestamp: '2026-04-28T04:41:00Z',
   },
 ];
+
+export const MOCK_FEED_INTERVAL_MS = 4500;
+
+const MAX_VISIBLE_MOCK_EVENTS = 5;
+const BASE_ACTIVE_LISTING_COUNT = 1248;
+const MOCK_SOL_USD_RATE = 154;
+
+const metricSolFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 2,
+});
+
+const metricIntegerFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 0,
+});
+
+type MockCollection = {
+  collection: string;
+  itemPrefix: string;
+  slug: string;
+  initials: string;
+  tone: NftSaleEvent['imagePlaceholder']['tone'];
+  baseFloorSol: number;
+  itemBase: number;
+};
+
+const mockCollections: MockCollection[] = [
+  {
+    collection: 'Mad Lads',
+    itemPrefix: 'Mad Lad',
+    slug: 'ml',
+    initials: 'ML',
+    tone: 'ember',
+    baseFloorSol: 54.2,
+    itemBase: 1200,
+  },
+  {
+    collection: 'Famous Fox Federation',
+    itemPrefix: 'Fox',
+    slug: 'ff',
+    initials: 'FF',
+    tone: 'teal',
+    baseFloorSol: 8.75,
+    itemBase: 1800,
+  },
+  {
+    collection: 'Claynosaurz',
+    itemPrefix: 'Claynosaurz',
+    slug: 'cz',
+    initials: 'CZ',
+    tone: 'amber',
+    baseFloorSol: 22.95,
+    itemBase: 300,
+  },
+  {
+    collection: 'Solana Monkey Business',
+    itemPrefix: 'SMB',
+    slug: 'smb',
+    initials: 'SM',
+    tone: 'violet',
+    baseFloorSol: 31.4,
+    itemBase: 900,
+  },
+  {
+    collection: 'Tensorian Shards',
+    itemPrefix: 'Shard',
+    slug: 'ts',
+    initials: 'TS',
+    tone: 'steel',
+    baseFloorSol: 3.62,
+    itemBase: 80,
+  },
+  {
+    collection: 'y00ts',
+    itemPrefix: 'y00t',
+    slug: 'y00t',
+    initials: 'Y0',
+    tone: 'rose',
+    baseFloorSol: 5.48,
+    itemBase: 6000,
+  },
+];
+
+const mockMarketplaces = ['Tensor', 'Magic Eden', 'Exchange.Art'] as const;
+
+const mockWallets = [
+  '9pQe7U9h4AjC7rtR6F1r',
+  'Fo3mK2aN9xvVh14tUQe8',
+  'D8m3rK4uVkLx5jN2cRs9',
+  '2Lq8AvhR9nQyZ1uP7xJ3',
+  'Gd4v9LkQpT1c8Ryu6Mn2',
+  '7BkR5Frp1eYoN3s9Hq8v',
+  '6BkyX8vWmN1qpA9eTr7c',
+  'Ho1z8nVzR4sUmLk6Qa2d',
+] as const;
+
+const mockSignatureSeeds = ['4jQWr3Za', '2qXc9Hz', '3pN9sCw', '5rVmKp4', 'n76QkLw', '8mQp2Xa'] as const;
+
+export function createInitialPulseFeed(): PulseFeedSnapshot {
+  return {
+    sales: latestSales,
+    listings: latestListings,
+    updatedAt: latestListings[0]?.timestamp ?? latestSales[0]?.timestamp ?? new Date().toISOString(),
+    sequence: 0,
+  };
+}
+
+export function createNextPulseFeed(current: PulseFeedSnapshot): PulseFeedSnapshot {
+  const sequence = current.sequence + 1;
+  const timestamp = new Date().toISOString();
+
+  return {
+    sales: [createMockSaleEvent(sequence, timestamp), ...current.sales].slice(0, MAX_VISIBLE_MOCK_EVENTS),
+    listings: [createMockListingEvent(sequence, timestamp), ...current.listings].slice(0, MAX_VISIBLE_MOCK_EVENTS),
+    updatedAt: timestamp,
+    sequence,
+  };
+}
+
+export function buildPulseMetrics(feed: PulseFeedSnapshot): PulseMetric[] {
+  const latestSale = feed.sales[0];
+  const latestListing = feed.listings[0];
+  const saleVolumeSol = feed.sales.reduce((total, sale) => total + sale.priceSol, 0);
+  const listingFloors = feed.listings.map((listing) => listing.listPriceSol / (1 + listing.floorDelta / 100));
+  const floorSol = listingFloors.length > 0 ? Math.min(...listingFloors) : 0;
+  const activeListingCount = BASE_ACTIVE_LISTING_COUNT + ((feed.sequence * 7) % 43) - Math.round(latestListing?.floorDelta ?? 0);
+  const activeCollectionCount = new Set([
+    ...feed.sales.map((sale) => sale.collection),
+    ...feed.listings.map((listing) => listing.collection),
+  ]).size;
+  const floorDelta = latestListing?.floorDelta ?? 0;
+  const latestSaleDelta = getLatestSaleDelta(feed.sales);
+
+  return [
+    {
+      label: 'Floor',
+      value: `${metricSolFormatter.format(floorSol)} SOL`,
+      delta: `${formatMetricDelta(floorDelta)} latest listing`,
+      status: getDeltaStatus(floorDelta),
+    },
+    {
+      label: 'Sales volume',
+      value: `${metricSolFormatter.format(saleVolumeSol)} SOL`,
+      delta: latestSale ? `${formatMetricDelta(latestSaleDelta)} latest sale` : 'mock feed',
+      status: 'live',
+    },
+    {
+      label: 'Listings',
+      value: metricIntegerFormatter.format(activeListingCount),
+      delta: `${feed.listings.length} latest rows`,
+      status: getDeltaStatus(floorDelta),
+    },
+    {
+      label: 'Active collections',
+      value: metricIntegerFormatter.format(activeCollectionCount),
+      delta: 'visible mock feed',
+      status: 'neutral',
+    },
+  ];
+}
+
+export const pulseMetrics: PulseMetric[] = buildPulseMetrics(createInitialPulseFeed());
+
+function createMockSaleEvent(sequence: number, timestamp: string): NftSaleEvent {
+  const collection = pick(mockCollections, sequence);
+  const priceSol = roundToHundredths(collection.baseFloorSol * (0.94 + (sequence % 5) * 0.018));
+  const marketplace = pick(mockMarketplaces, sequence);
+
+  return {
+    id: `sale-mock-${sequence}`,
+    collection: collection.collection,
+    itemName: buildItemName(collection, sequence),
+    imagePlaceholder: {
+      initials: collection.initials,
+      tone: collection.tone,
+    },
+    marketplace,
+    priceSol,
+    priceUsd: Math.round(priceSol * MOCK_SOL_USD_RATE),
+    buyer: pick(mockWallets, sequence, 1),
+    seller: pick(mockWallets, sequence, 5),
+    signature: buildMockSignature(sequence, 'Sale'),
+    timestamp,
+  };
+}
+
+function createMockListingEvent(sequence: number, timestamp: string): NftListingEvent {
+  const collection = pick(mockCollections, sequence, 2);
+  const floorDelta = roundToTenths(((sequence % 7) - 3) * 1.15);
+  const listPriceSol = roundToHundredths(collection.baseFloorSol * (1 + floorDelta / 100));
+  const marketplace = pick(mockMarketplaces, sequence, 1);
+  const itemName = buildItemName(collection, sequence, 43);
+
+  return {
+    id: `listing-mock-${sequence}`,
+    collection: collection.collection,
+    itemName,
+    imagePlaceholder: {
+      initials: collection.initials,
+      tone: collection.tone,
+    },
+    marketplace,
+    listPriceSol,
+    listPriceUsd: Math.round(listPriceSol * MOCK_SOL_USD_RATE),
+    floorDelta,
+    seller: pick(mockWallets, sequence, 3),
+    listingId: `${marketplace.toLowerCase().replace(/\W/g, '')}-${collection.slug}-${itemName.replace(/\W/g, '').toLowerCase()}-${sequence}`,
+    timestamp,
+  };
+}
+
+function getLatestSaleDelta(sales: NftSaleEvent[]) {
+  if (sales.length < 2) {
+    return 0;
+  }
+
+  const [, ...previousSales] = sales;
+  const previousAverage = previousSales.reduce((total, sale) => total + sale.priceSol, 0) / previousSales.length;
+
+  if (previousAverage === 0) {
+    return 0;
+  }
+
+  return ((sales[0].priceSol - previousAverage) / previousAverage) * 100;
+}
+
+function getDeltaStatus(value: number): PulseMetric['status'] {
+  if (value > 0) {
+    return 'positive';
+  }
+
+  if (value < 0) {
+    return 'negative';
+  }
+
+  return 'neutral';
+}
+
+function formatMetricDelta(value: number) {
+  return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+}
+
+function buildItemName(collection: MockCollection, sequence: number, offset = 0) {
+  const number = collection.itemBase + ((sequence * 137 + offset) % 9000);
+  return `${collection.itemPrefix} #${String(number).padStart(4, '0')}`;
+}
+
+function buildMockSignature(sequence: number, label: 'Sale' | 'Listing') {
+  return `${pick(mockSignatureSeeds, sequence)}Pulse${label}${sequence.toString(36)}Mock${sequence * 17}`;
+}
+
+function pick<T>(items: readonly T[], sequence: number, offset = 0) {
+  return items[(sequence + offset) % items.length];
+}
+
+function roundToHundredths(value: number) {
+  return Number(value.toFixed(2));
+}
+
+function roundToTenths(value: number) {
+  return Number(value.toFixed(1));
+}
