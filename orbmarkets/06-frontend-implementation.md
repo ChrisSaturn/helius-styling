@@ -26,7 +26,7 @@ Create or map tokens for:
 
 Use stable token names in implementation. The generated CSS module names from production are evidence only and should not become front-end API names.
 
-## Initial Token Map From `OM-001-home`
+## Initial Token Map From Reviewed Captures
 
 Treat these as implementation candidates until live CSS confirms exact values.
 
@@ -45,6 +45,11 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Color | `color.status.positive` | Positive percentage changes and A score badge. |
 | Color | `color.status.warning` | B score badge. |
 | Color | `color.status.negative` | Negative percentage changes and C score badge. |
+| Color | `color.modal.border.accent` | AI analysis popup outer stroke. |
+| Color | `color.modal.divider` | AI analysis popup header divider. |
+| Color | `color.action.ai.surface` | Filled primary AI action. |
+| Color | `color.surface.assistant.cta` | Secondary Lana CTA body. |
+| Color | `color.surface.assistant.icon` | Left icon tile inside the Lana CTA. |
 | Typography | `font.sans` | IBM Plex Sans primary UI text. |
 | Typography | `font.mono` | Geist Mono technical labels, chips, identifiers, and possible numeric alignment. |
 | Size | `size.header.desktop` | 69 px app header. |
@@ -53,10 +58,25 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Layout | `layout.header.logoRail` | ~165-175 px reserved desktop brand area before search. |
 | Size | `size.table.row.dense` | ~64 px market table row. |
 | Size | `size.table.row.width.desktop` | ~1336 px observed desktop table row. |
+| Size | `size.table.row.marketItem` | ~50-56 px token detail market item row. |
 | Size | `size.token.logo.md` | ~40 px circular token image. |
+| Size | `size.marketPair.logo.sm` | ~24-28 px overlapping circular market pair logos. |
 | Size | `size.table.row.buyButton` | ~56 x 40 px compact row action. |
 | Size | `size.score.badge.md` | ~32-40 px score badge footprint. |
+| Size | `size.chart.tokenDetail.height.desktop` | ~300 px token detail chart plot area. |
+| Layout | `layout.tokenDetail.summaryGrid.desktop` | 2 by 2 stat grid for Supply, Liquidity, Market Cap, and FDV. |
+| Layout | `layout.tokenDetail.kpiBand.desktop` | Three equal KPI columns for Price, Holders, and 24H Volume. |
+| Color | `color.chart.grid` | Faint token detail chart grid lines. |
+| Color | `color.chart.axisText` | Right y-axis and bottom x-axis labels. |
+| Color | `color.chart.line.negative` | Red token price line when selected period is down. |
+| Color | `color.chart.frame.accent` | Chart corner brackets and active timeframe border. |
+| Size | `size.popup.aiAnalysis.width.compact` | 380 px AI analysis popup reference width. |
+| Size | `size.popup.aiAnalysis.height.idle` | 331 px AI analysis popup idle reference height. |
+| Size | `size.popup.aiAnalysis.header` | ~50 px AI popup header. |
+| Size | `size.action.ai.primary` | ~112 x 36 px `Analyze` button. |
+| Size | `size.action.assistant.cta` | ~222 x 58 px Lana secondary CTA. |
 | Radius | `radius.control.sm` | ~4-6 px buttons, chips, segmented controls. |
+| Radius | `radius.modal.md` | ~8 px AI popup and assistant CTA. |
 | Border | `border.subtle` | 1 px low-contrast divider and control border. |
 
 ## Front-End Constraints To Track
@@ -69,6 +89,7 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Tables with many columns.
 - Mobile layouts for dense data.
 - Live updates without layout jumps.
+- Client-rendered chart layers that may be absent from design captures.
 - Font loading and fallback behavior for dense numeric and identifier-heavy views.
 
 ## Desktop Top Navigation Component Contract
@@ -94,9 +115,38 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Avoid making the whole row a single interactive control if star and Buy remain nested controls; use a clear row link target or cell-level link strategy.
 - Sparkline charts should reserve fixed dimensions even when data is missing.
 
+## Token Detail Implementation Rules
+
+- Compose token detail pages from the shared app shell, token detail header, summary stat grid, KPI band, time-series chart, entity tab bar, and section table components.
+- Keep the token detail stack on the black app canvas. Do not wrap the header, KPI band, chart, or tab area in floating cards.
+- Preserve the 2 by 2 summary stat grid at desktop width and align large numeric values right.
+- Keep the Price, Holders, and 24H Volume KPI band as three equal columns with stable dividers and large values.
+- Treat the time-series chart as a browser-verified component. Paper node `1AG-0` can miss chart layers, so QA must verify the rendered series, grid, axes, labels, timeframe state, mode controls, and tooltips in a live browser.
+- Reserve a stable chart height before data arrives. Loading, empty, no-data, and error states must not collapse the chart or move the tab bar.
+- Support all observed timeframe controls until production is confirmed: Paper shows `5m`, `1H`, `24H`, `7D`; the browser screenshot shows `1H`, `24H`, `7D`, `1M`, `1Y`, and `Live`.
+- Expose chart controls with semantic buttons or tabs, visible focus, and accessible names. Provide a text summary or data-table fallback for the active chart window.
+- Keep right y-axis labels and bottom time labels outside the plot line layer so live updates do not resize the plot region.
+- Do not treat the orange circular overlay visible in Paper as part of the chart layout until its source is confirmed.
+- Implement the Top Markets table with fixed numeric columns, sortable headers, venue labels, paired token logos, rows-per-page control, and pagination semantics.
+- Use a dedicated Market Item Row component for token-detail market tables. It should render paired overlapping token logos, market pair, venue subtitle, rate, liquidity, 24H volume, 24H trades, and 24H unique counts.
+- Keep market item numeric columns fixed and right or center aligned per column so live liquidity and volume changes do not move neighboring cells.
+- Degrade missing market identity data in this order: preserve pair symbols, then venue, then logos. Missing logos should fall back to neutral circular placeholders without changing row height.
+- Do not attach favorite, score, or Buy controls to market item rows unless a separate production capture confirms those actions in this table.
+
+## AI Analysis Popup Component Contract
+
+- Compose the popup from a reusable modal shell, header title row, icon-only close button, centered content stack, primary AI action, and assistant handoff CTA.
+- Use dialog semantics with `aria-labelledby`, focus trap, Escape-to-close, and focus return to the triggering control.
+- Keep the idle state compact at the observed 380 x 331 px reference. Loading, result, and error states must reserve stable space or use a separately captured expanded variant.
+- Keep `Analyze` as the single primary action. The Lana CTA is secondary and should not share the filled red treatment.
+- Disable or busy-state the primary button during AI requests to prevent duplicate submissions.
+- Preserve concise copy. If token-specific names are injected, test long names so the centered paragraph and button stack do not overflow.
+- Treat backdrop, overlay placement, mobile presentation, streaming output, and assistant route target as unresolved until captured from production.
+
 ## Accessibility Baseline
 
-- Keyboard access for search, menus, tabs, filters, and row actions.
+- Keyboard access for search, menus, tabs, filters, row actions, and AI popup controls.
+- Dialog keyboard support for AI popups, including focus trap, Escape, and focus return.
 - Visible focus states.
 - Color contrast that holds across status badges and secondary text.
 - Copy buttons with accessible labels.

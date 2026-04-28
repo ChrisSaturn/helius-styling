@@ -23,14 +23,24 @@ Each component should include:
 | App shell | Observed in `OM-001-home` | Page container plus reusable desktop top navigation placement. |
 | Desktop top navigation | Observed in `OM-001-home` | `orb` lockup, search rail, utility action, route links, network entry, settings control. |
 | Global search | Observed in `OM-001-home` | Header search with placeholder and `/` shortcut affordance; suggestions still pending. |
+| AI analysis popup | Observed in `OM-009-ai-analysis-popup` | Compact tool modal with red outline, centered copy, primary AI action, and Lana handoff. |
+| Primary AI action button | Observed in `OM-009-ai-analysis-popup` | Filled red `Analyze` button with AI icon and mono label. |
+| Assistant handoff CTA | Observed in `OM-009-ai-analysis-popup` | Bordered secondary CTA for `Go deeper with Lana`. |
 | Data table | Observed in `OM-001-home` | Dense market table, fixed columns, 20 visible rows, sorting affordances. |
 | Token market row | Observed in `OM-001-home` | Individual token row from Paper node `4X-0`; sizing, colors, and action placement confirmed. |
+| Token detail header | Observed in `OM-005-token-detail` | Token identity, favorite, score, copy, social links, and compact `BUY` action. |
+| Summary stat grid | Observed in `OM-005-token-detail` | 2 by 2 token stat matrix for Supply, Liquidity, Market Cap, and FDV. |
+| Token KPI band | Observed in `OM-005-token-detail` | Three-column Price, Holders, and 24H Volume metric strip. |
+| Time-series chart | Observed in `OM-005-token-detail` | Paper captured the shell; screenshot confirms red line, grid, axes, timeframe, mode, and live controls. |
+| Entity tab bar | Observed in `OM-005-token-detail` | Markets, History, Holders, Metadata, Social. |
+| Top markets table | Observed in `OM-005-token-detail` | Token-specific market rows with liquidity, volume, trades, unique count, and pagination. |
+| Market item row | Observed in `OM-005-token-detail` | Individual token market row from Paper node `1HQ-0`; paired logos, venue subtitle, and fixed numeric columns. |
 | Hash or address display | Pending capture | Truncation, copy action, link behavior, monospace usage. |
 | Score badge | Observed in `OM-001-home` | Hex grade badge for A/B/C market score. |
 | Status badge | Pending capture | Transaction status, validator status, risk or health states. |
-| Stat tile | Pending capture | Network metrics and compact KPI display. |
-| Detail panel | Pending capture | Label/value pairs, grouped metadata, nested actions. |
-| Tabs | Observed in `OM-001-home` | Category navigation with underline active state. |
+| Stat tile | Observed in `OM-005-token-detail` | Token summary stats and KPI panels. |
+| Detail panel | Observed in `OM-005-token-detail` | Label/value pairs, grouped token metadata, nested actions. |
+| Tabs | Observed in `OM-001-home`, `OM-005-token-detail` | Category navigation and token entity section navigation. |
 | Filters | Observed in `OM-001-home` | Time-window segmented control for market table. |
 | Toast or feedback | Pending capture | Copy confirmation, errors, and async action feedback. |
 
@@ -62,6 +72,106 @@ Each component should include:
 - Data constraints: placeholder and typed values must fit inside the header without resizing the header.
 - Accessibility expectations: expose a real input, visible focus state, keyboard shortcut hint, and accessible label.
 - Production evidence: `OM-001-home`, Paper node `2-0`.
+
+## AI Analysis Popup
+
+- Purpose: invite the user to run AI-generated token analysis while preserving the current token context.
+- Anatomy: red-accent modal shell, header AI icon, `AI Token Analysis` title, close icon, divider, centered heading, explanatory copy, filled `Analyze` button, and bordered `Go deeper with Lana` secondary CTA.
+- Variants: idle state observed; analyzing, generated result, error, rate-limit, unsupported token, and mobile full-screen variants remain pending.
+- States: default idle state observed; hover, focus, disabled, loading, close transition, and post-analysis result states pending.
+- Sizing: Paper node `1QP-0` is 380 px wide by 331 px high. Header is roughly 50 px high. Primary action is approximately 112 x 36 px. Secondary CTA is approximately 222 x 58 px.
+- Color: black modal fill, red outer stroke, charcoal divider, red primary button, muted body text, bordered black secondary CTA, and darker left icon tile inside the Lana CTA.
+- Data constraints: keep the explanatory copy short enough to remain a centered two-line paragraph at 380 px width. Do not insert long token names into the title area unless a wider or responsive variant is captured.
+- Responsive behavior: unresolved. Treat 380 px as the compact reference and keep the action stack centered until the full overlay behavior is captured.
+- Accessibility expectations: render as a labelled dialog, trap focus while open, close on Escape, return focus to the trigger, expose the close button label, and include token context in the primary action label when available.
+- Implementation notes: keep the popup focused on one decision. Do not add extra panels, helper rows, or analysis output in the idle state unless production confirms them.
+- Production evidence: `OM-009-ai-analysis-popup`, Paper node `1QP-0`, source `https://app.paper.design/file/01KQ91NY8A16SXDG8G6QEJVM78/1-0/1QP-0`.
+
+## Primary AI Action Button
+
+- Purpose: start AI token analysis from the popup.
+- Anatomy: compact filled red button, leading AI icon, `Analyze` label.
+- Typography: label appears mono and technical, matching the product's data-forward tone.
+- States: default observed; hover, focus, disabled, loading, success, and error states pending.
+- Accessibility expectations: use a real button, announce loading state, prevent duplicate requests while analysis is running, and include token context in the accessible name when available.
+- Production evidence: `OM-009-ai-analysis-popup`, Paper node `1QP-0`.
+
+## Assistant Handoff CTA
+
+- Purpose: route the user from a lightweight analysis prompt into the deeper Lana assistant path.
+- Anatomy: bordered rounded container, left dark icon tile, bold `Go deeper with Lana` label, and right diagonal arrow.
+- States: default observed; hover, focus, pressed, loading, and unavailable states pending.
+- Data constraints: preserve enough horizontal room for the Lana label; if the assistant name changes, recheck the 380 px popup width.
+- Accessibility expectations: expose whether the action opens a new route, external destination, or assistant panel once behavior is confirmed.
+- Implementation notes: this is a secondary action, not a second primary button. Keep it visually quieter than `Analyze`.
+- Production evidence: `OM-009-ai-analysis-popup`, Paper node `1QP-0`.
+
+## Token Detail Header
+
+- Purpose: identify the selected token and provide immediate token-level actions.
+- Anatomy: favorite star, circular token logo, verification badge, title, token type, truncated token address, copy action, score badge, social/external icons, and compact `BUY` button.
+- States: default populated Wrapped SOL header observed; hover, focus, watchlisted, copied, disabled, and buy-loading states pending.
+- Data constraints: title and ticker must remain readable while long addresses truncate before the copy action. Missing logos, missing verification, or missing socials should not shift the title and action rhythm.
+- Accessibility expectations: favorite, copy, social links, score badge, and `BUY` action require explicit labels with token context.
+- Production evidence: `OM-005-token-detail`, Paper node `1AG-0`.
+
+## Summary Stat Grid
+
+- Purpose: expose secondary token fundamentals near the header without competing with the chart.
+- Anatomy: 2 by 2 matrix with label/value pairs for Supply, Liquidity, Market Cap, and FDV.
+- States: populated observed; loading, missing, stale, and error states pending.
+- Data constraints: values can be very large and should align right without forcing the grid to resize.
+- Implementation notes: use fixed columns at desktop width and tabular numeric rendering where available.
+- Production evidence: `OM-005-token-detail`, Paper node `1AI-0`.
+
+## Token KPI Band
+
+- Purpose: summarize the chart-adjacent headline metrics before the user reads the plot.
+- Anatomy: three equal panels for Price, Holders, and 24H Volume; each panel uses a compact label chip, optional status direction, timeframe text, and a large value.
+- States: price negative and volume positive states observed; neutral holders state observed. Loading, stale, missing, and zero states pending.
+- Data constraints: large values such as 24H volume must fit without changing column widths.
+- Implementation notes: preserve equal columns and dividers; do not turn these panels into independent floating cards.
+- Production evidence: `OM-005-token-detail`, Paper node `1AI-0`.
+
+## Time-Series Chart
+
+- Purpose: show token price movement for the selected timeframe.
+- Anatomy: chart frame, red corner brackets, top-left timeframe segmented control, optional `Live` chip, plot grid, red or green series line, right-side y-axis labels, bottom x-axis labels, and bottom-left line/candle mode controls.
+- States: Paper captured an empty chart shell; the supplied browser screenshot confirms the complete 24H rendered state. Loading, empty, no-data, error, live-on, live-off, tooltip, and candle mode states remain pending.
+- Data constraints: y-axis labels must fit on the right without changing the plot size during live updates. The chart must reserve a stable height while hydrating or when data is missing.
+- Accessibility expectations: expose controls as real buttons or tabs, provide visible focus, and include a non-visual summary of the chart data or a data-table fallback.
+- Implementation notes: treat the chart as a reusable shell with independently rendered data layers. Paper may not capture canvas-rendered series, so front-end QA must verify the rendered line, axes, grid, and tooltip in a browser.
+- Production evidence: `OM-005-token-detail`, Paper node `1AG-0`, user-supplied browser screenshot.
+
+## Entity Tab Bar
+
+- Purpose: switch between token-specific sections without leaving token context.
+- Anatomy: text tabs for Markets, History, Holders, Metadata, and Social.
+- States: Markets active observed; hover, focus, disabled, and loading states pending.
+- Implementation notes: active state uses white text and section position, not color alone.
+- Production evidence: `OM-005-token-detail`, Paper node `1FI-0`.
+
+## Top Markets Table
+
+- Purpose: list token markets by venue and liquidity/activity metrics.
+- Anatomy: table title, column headers, market item rows, rate, liquidity, volume, trades, unique count, rows-per-page control, and pagination.
+- States: populated table observed; sort indicators visible for Liquidity and Volume (24H). Loading, empty, error, row hover, selected row, and pagination disabled states pending.
+- Data constraints: pool names, venue names, rates, and high-volume values must align without column jumping.
+- Accessibility expectations: use real table semantics, labeled sort buttons, row links with market context, and accessible pagination.
+- Production evidence: `OM-005-token-detail`, Paper node `1G7-0`.
+
+## Market Item Row
+
+- Purpose: show one liquidity venue or pool for the active token in a scan-friendly table row.
+- Anatomy: paired overlapping circular token logos, two-line market identity with pair name and venue subtitle, rate, liquidity, volume (24H), trades (24H), and unique (24H).
+- Sizing: Paper node `1HQ-0` is a full-width table row within the token detail markets table. The row is approximately 50-56 px high, with a compact paired-logo cluster and a two-line identity stack.
+- Color: row background is black; bottom divider is subtle charcoal; pair name and numeric values are near-white; venue subtitle is muted gray.
+- States: default row observed; hover, selected, focused, loading, empty-logo, missing-venue, and row-error states pending.
+- Data constraints: market pair names should truncate after preserving both token symbols when possible. Venue labels are secondary and can truncate first. Numeric columns should stay fixed and align consistently for currency, decimal, and integer formats.
+- Responsive behavior: desktop row observed; responsive pruning is unresolved. Preserve market identity, liquidity, and 24H volume before lower-priority activity columns at narrow widths.
+- Accessibility expectations: if the row links to a market or pool detail, expose pair and venue in the link name. Logo images need useful alt text or should be hidden when redundant with text.
+- Implementation notes: do not reuse the home `Token Market Row` component directly. This row has no favorite, rank, score, or buy action, and its identity cell represents a market pair plus venue rather than a single token.
+- Production evidence: `OM-005-token-detail`, Paper node `1HQ-0`, source `https://app.paper.design/file/01KQ91NY8A16SXDG8G6QEJVM78/1-0/1HQ-0`.
 
 ## Category Tabs
 

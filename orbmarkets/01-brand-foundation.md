@@ -27,6 +27,7 @@ OrbMarkets presents Solana network data through a fast, technical, high-signal e
 | --- | --- | --- |
 | `OM-001-home` | Header uses a lowercase `orb` wordmark with a segmented orange circular mark. | In product chrome, treat the compact `orb` lockup as the primary brand signal and keep surrounding UI restrained. |
 | `OM-001-home`, Paper node `2-0` | Brand sits in a compact left rail while search, `Me`, `Network`, and settings carry the product workflow. | The brand should support a search-first explorer workflow instead of becoming a large marketing header inside app views. |
+| `OM-009-ai-analysis-popup` | AI popup uses direct copy: `AI Token Analysis`, `Analyze this token with AI`, and `Analyze`, with a warmer secondary handoff to `Lana`. | AI surfaces should stay functional and concise first; named assistant language can add warmth only as a secondary path. |
 
 ## Voice
 
@@ -52,3 +53,4 @@ Avoid:
 - Confirm where IBM Plex Sans and Geist Mono are applied, then capture weight scale, size scale, and numeric formatting.
 - Confirm whether OrbMarkets uses Helius parent-brand references in product UI.
 - Confirm canonical naming: `Orb`, `Orb Markets`, or `OrbMarkets` across UI surfaces.
+- Confirm whether `Lana` is the canonical AI assistant name and which surfaces may use that name.
