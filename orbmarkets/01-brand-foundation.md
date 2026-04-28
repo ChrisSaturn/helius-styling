@@ -21,6 +21,13 @@ OrbMarkets presents Solana network data through a fast, technical, high-signal e
 - Dense but controlled: supports large tables and detail views without visual noise.
 - Solana-native: aligns with ecosystem expectations while retaining its own product identity.
 
+## Production Evidence
+
+| Capture | Evidence | Brand implication |
+| --- | --- | --- |
+| `OM-001-home` | Header uses a lowercase `orb` wordmark with a segmented orange circular mark. | In product chrome, treat the compact `orb` lockup as the primary brand signal and keep surrounding UI restrained. |
+| `OM-001-home`, Paper node `2-0` | Brand sits in a compact left rail while search, `Me`, `Network`, and settings carry the product workflow. | The brand should support a search-first explorer workflow instead of becoming a large marketing header inside app views. |
+
 ## Voice
 
 Use concise, functional UI language. Labels should be direct and data-oriented.
@@ -42,7 +49,6 @@ Avoid:
 ## Brand Questions To Resolve From Production Captures
 
 - Confirm the primary brand color set and accent usage.
-- Confirm typography family, weight scale, and numeric formatting.
+- Confirm where IBM Plex Sans and Geist Mono are applied, then capture weight scale, size scale, and numeric formatting.
 - Confirm whether OrbMarkets uses Helius parent-brand references in product UI.
 - Confirm canonical naming: `Orb`, `Orb Markets`, or `OrbMarkets` across UI surfaces.
-

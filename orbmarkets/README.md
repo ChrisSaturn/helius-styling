@@ -17,6 +17,7 @@ This folder is the front-end design source of truth for OrbMarkets. It starts as
 ## Current Status
 
 - Baseline documentation structure is in place.
-- Production screenshots, page-level audits, and component evidence are pending.
+- Home market table production evidence is captured in [home.md](./home.md).
+- Desktop top navigation from Paper node `2-0` is promoted as a reusable component in [Components](./03-components.md).
+- Shared visual, component, page pattern, interaction, and implementation docs now include first-pass styling guidance from `OM-001-home`.
 - Each future Paper MCP design import should create or update one entry in `production-design-index.md`, then add a screen-specific Markdown file using `production-design-template.md`.
-
