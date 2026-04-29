@@ -18,7 +18,7 @@ Create or map tokens for:
   - `font.sans`: `IBM Plex Sans`, `IBM Plex Sans Fallback`.
   - `font.mono`: `Geist Mono`, `Geist Mono Fallback`.
 - Spacing scale.
-- Radius scale.
+- Corner treatment tokens.
 - Border and divider styles.
 - Shadow or elevation rules, if used.
 - Motion durations and easing.
@@ -68,12 +68,22 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Size | `size.table.row.buyButton` | ~56 x 40 px compact row action. |
 | Size | `size.score.badge.md` | ~32-40 px score badge footprint. |
 | Size | `size.chart.tokenDetail.height.desktop` | ~300 px token detail chart plot area. |
+| Size | `size.networkStats.chartPanel.height.desktop` | ~270 px network TPS and SOL price panel reference height. |
+| Size | `size.networkStats.summaryPanel.height.desktop` | ~176 px compact validator summary panel body. |
+| Size | `size.networkStats.validatorTable.row` | ~56-64 px active validator row cadence. |
+| Size | `size.networkStats.epochPanel.height` | Stable epoch progress and slot-stat band height. |
 | Layout | `layout.tokenDetail.summaryGrid.desktop` | 2 by 2 stat grid for Supply, Liquidity, Market Cap, and FDV. |
 | Layout | `layout.tokenDetail.kpiBand.desktop` | Three equal KPI columns for Price, Holders, and 24H Volume. |
+| Layout | `layout.networkStats.chartGrid.desktop` | Two equal chart panels for TPS and SOL price. |
+| Layout | `layout.networkStats.summaryGrid.desktop` | Three equal validator summary panels. |
 | Color | `color.chart.grid` | Faint token detail chart grid lines. |
 | Color | `color.chart.axisText` | Right y-axis and bottom x-axis labels. |
 | Color | `color.chart.line.negative` | Red token price line when selected period is down. |
 | Color | `color.chart.frame.accent` | Chart corner brackets and active timeframe border. |
+| Color | `color.chart.bar.primary` | Pulse Recharts marketplace volume bars. |
+| Color | `color.chart.bar.secondary` | Pulse Recharts listing-depth bars. |
+| Color | `color.chart.cursor` | Recharts hover/focus cursor fill. |
+| Color | `color.chart.tooltip.surface` | Recharts tooltip body. |
 | Size | `size.popup.aiAnalysis.width.compact` | 380 px AI analysis popup reference width. |
 | Size | `size.popup.aiAnalysis.height.idle` | 331 px AI analysis popup idle reference height. |
 | Size | `size.popup.aiAnalysis.header` | ~50 px AI popup header. |
@@ -81,8 +91,7 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Size | `size.popup.settings.header` | ~50 px settings popup title and close row. |
 | Size | `size.action.ai.primary` | ~112 x 36 px `Analyze` button. |
 | Size | `size.action.assistant.cta` | ~222 x 58 px Lana secondary CTA. |
-| Radius | `radius.control.sm` | ~4-6 px buttons, chips, segmented controls. |
-| Radius | `radius.modal.md` | ~8 px AI popup and assistant CTA. |
+| Radius | `radius.corner.none` | 0 px for visible UI corners on controls, panels, popups, modals, command blocks, progress tracks, and CTA shells. |
 | Border | `border.subtle` | 1 px low-contrast divider and control border. |
 
 ## Front-End Constraints To Track
@@ -106,7 +115,19 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Reserve orange outlines for primary actions such as Buy, production-confirmed main controls such as captured chart or market timeframe controls, and focus states that need stronger contrast than a neutral ring.
 - Render collection names, primary row drill-down labels, and main clickable text in `color.text.primary`/White. Use `color.text.secondary` or `color.text.muted` for supporting metadata only, such as marketplaces, venues, timestamps, inactive utility controls, and non-primary identifiers.
 - Keep visible surface hierarchy shallow. A popup, table band, KPI band, chart frame, or modal should be the visible container; rows and controls inside it should usually be separated with spacing and dividers rather than more bordered boxes.
+- Set visible UI corner radius to 0 px across Orb surfaces and controls. Do not round searches, nav utilities, buttons, chips, segmented controls, table panels, KPI bands, popups, modals, command blocks, progress tracks, toggles, or landing tiles.
+- Preserve circular or asset-defined shapes only where the shape is intrinsic to the asset or plot mark, such as the Orb mark, token logos, paired market logos, or chart points.
 - Settings rows such as `Display`, `Density`, and `Network` should sit directly inside the popup shell. Choices such as `Dark` and `System` should be flat buttons or one minimal segmented group, not separate visible subcontainers.
+
+## Recharts Implementation Contract
+
+- Use Recharts for Pulse `Stats` marketplace volume and listing-depth charts through a small adapter component rather than hand-rolled SVG geometry in the page component.
+- Keep chart data normalized before rendering. The current adapter expects labelled `{ label, value, detail }` buckets and caller-provided formatters for axes, tooltips, and summary text.
+- Style Recharts through Orb tokens: `--color-chart-grid`, `--color-chart-baseline`, `--color-chart-axis-text`, `--color-chart-bar`, `--color-chart-bar-hover`, `--color-chart-cursor`, and `--color-chart-tooltip-bg`.
+- Do not use generic `--chart-1`/`--chart-2`, rounded bar defaults, gradients, chart-card wrappers, or external tooltip themes unless those values are explicitly mapped back to Orb chart roles.
+- Use `ResponsiveContainer` inside a fixed-height panel, right-side `YAxis`, bottom `XAxis`, horizontal grid only, square bars, custom black tooltip, and `accessibilityLayer`.
+- Preserve a hidden chart summary and stable lazy-loading fallback so chart loading, empty data, or source errors do not collapse the Stats band.
+- Lazy-load heavy Recharts renderers from the feature view that needs them. The default Pulse monitor route should not import Recharts until the `Stats` chart band renders.
 
 ## Site Spacing Contract
 
@@ -130,7 +151,8 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Keep the component route-agnostic. Active route, network label, auth state, and search value should be props or state inputs, not hardcoded per page.
 - Render the search as a real input and keep it dominant at desktop width. The trailing utility icon and `/` affordance stay inside the search rail.
 - Preserve the 69 px desktop header height and stable horizontal rhythm on the shared site rail. Avoid wrapping; collapse secondary links at narrower widths once responsive behavior is confirmed.
-- Use compact icon buttons for non-text utility actions. `Me` and `Network` remain text entries in the observed desktop state.
+- Use compact icon buttons for non-text utility actions. `Me` and `Network` remain text entries in the observed desktop state; the local prototype labels the second entry `Stats`.
+- In the local `/pulse` prototype, the observed `Network` slot is intentionally used as a `Stats` route for mock NFT marketplace stats. It borrows compact panel styling from the captured network stats hierarchy without rendering network data.
 - Reserve accessible names for search, copy/share utility, settings, and any network selector. Mark active route or selected network semantically.
 - Treat menu panels, auth menus, search suggestions, and mobile behavior as unresolved until captured from production.
 
@@ -145,7 +167,7 @@ Prototype source: `OM-PROT-003-settings`; not production evidence.
 - Use real controls for future compatibility: segmented choices should be buttons with `aria-pressed`; toggles should be checkboxes or switches with accessible labels. The selected visual treatment for these secondary controls should be selected text fill/color plus weight before accent outlines.
 - Close on Escape and when navigating between local prototype views. Future production work should add focus trap, focus return, outside-click policy, saved state, and persistence errors.
 - Keep desktop width around 360 px and use a fixed inset popup on narrow viewports. Labels must fit without resizing rows or colliding with segmented controls.
-- Use the Orb popup surface rules: black fill, subtle dividers, compact radii, one visible popup shell, and no nested card layout. Avoid wrapping each settings row or each segment choice in an additional visible box. Use red-orange only for primary emphasis, production-confirmed main active controls, or visible focus treatment.
+- Use the Orb popup surface rules: black fill, subtle dividers, square 0 px corners, one visible popup shell, and no nested card layout. Avoid wrapping each settings row or each segment choice in an additional visible box. Use red-orange only for primary emphasis, production-confirmed main active controls, or visible focus treatment.
 
 ## Home Table Implementation Rules
 
@@ -175,7 +197,7 @@ Prototype source: `OM-PROT-003-settings`; not production evidence.
 - Implement the Top Markets table with fixed numeric columns, sortable headers, venue labels, paired token logos, rows-per-page control, and pagination semantics.
 - Use a dedicated Market Item Row component for token-detail market tables. It should render paired overlapping token logos, market pair, venue subtitle, rate, liquidity, 24H volume, 24H trades, and 24H unique counts.
 - Keep market item numeric columns fixed and right or center aligned per column so live liquidity and volume changes do not move neighboring cells.
-- Degrade missing market identity data in this order: preserve pair symbols, then venue, then logos. Missing logos should fall back to neutral circular placeholders without changing row height.
+- Degrade missing market identity data in this order: preserve pair symbols, then venue, then logos. Missing logos should fall back to neutral fixed-size placeholders without changing row height.
 - Do not attach favorite, score, or Buy controls to market item rows unless a separate production capture confirms those actions in this table.
 
 ## AI Analysis Popup Component Contract
@@ -197,6 +219,7 @@ Prototype source: `OM-PROT-001-pulse`; not production evidence.
 - Until Helius or marketplace integrations exist, seed Pulse from local placeholder rows and update a capped mock-feed snapshot on one interval. Generated mock rows should exercise latest sales, latest listings, updated timestamp, and derived KPI behavior without implying production stream health.
 - Use one KPI band with equal metric cells for monitor summaries. Do not turn monitor metrics into floating cards.
 - Derive monitor KPI values from the current event snapshot where practical: floor from listing prices/deltas, sales volume from visible sales, listing count from a mock aggregate, and active collections from visible event rows.
+- Animate incoming mock or live data with CSS classes derived from event identity and snapshot sequence. New row feedback should animate `td` background/rail and inner wrappers only; KPI feedback should animate metric cells only. Do not animate `tr` layout, change row height, alter column widths, move scroll position, or steal keyboard focus.
 - Use fixed table layouts for sales and listings. Preserve row height, column widths, and numeric alignment during future live inserts.
 - Preserve native table semantics for dense lists. Do not put `display: grid`, `display: flex`, or layout containment on `tr`, `th`, or `td`; put stacked identity, numeric, or action content inside inner wrappers.
 - Keep NFT identity cells fixed-size with a placeholder image tile, item name, and collection subtitle. Real image loading must not resize rows.
@@ -208,11 +231,11 @@ Prototype source: `OM-PROT-001-pulse`; not production evidence.
 
 Current `/pulse` implementation alignment:
 
-- `pulse/src/App.tsx` uses local view state for the Pulse monitor and `Me` profile/portfolio, local Pulse feed state seeded from placeholder rows, one mock-refresh interval with functional state updates, derived Pulse KPI metrics, `aria-current` for the active `Me` nav state, `aria-pressed` for active timeframes, static Lucide icon imports, memoized navigation/settings/timeframe and sales/listing/portfolio row components, module-level SOL/USD/UTC formatters, inner numeric wrappers, and full-value labels for truncated identifiers.
+- `pulse/src/App.tsx` uses local view state for the Pulse monitor, `Me` profile/portfolio, and NFT-only `Stats` marketplace views, local Pulse feed state seeded from placeholder rows, one mock-refresh interval with functional state updates, derived Pulse KPI metrics, incoming row flags for the newest generated sales/listings, KPI refresh sequencing, lazy-loaded Recharts marketplace charts, `aria-current` for the active `Me` and `Stats` nav states, `aria-pressed` for active timeframes, static Lucide icon imports, memoized navigation/settings/timeframe and sales/listing/portfolio/stats row components, module-level SOL/USD/UTC formatters, inner numeric wrappers, and full-value labels for truncated identifiers.
 - `pulse/src/App.tsx` also includes the placeholder settings popup with open state, Escape-to-close, active trigger semantics, inert segmented controls, and a labelled toggle.
 - `pulse/index.html` links the Pulse favicon set from `/winniepoo-mert/favicon_io/`; Vite serves the copied bundle from `pulse/public/winniepoo-mert/favicon_io`, including the `.ico`, PNG sizes, Apple touch icon, and manifest with Pulse app names and black theme/background colors.
-- `pulse/src/pulseData.ts` owns the mock feed boundary through `createInitialPulseFeed`, `createNextPulseFeed`, `buildPulseMetrics`, deterministic generated row factories, a fixed visible-row cap, and the 4.5 second refresh constant so future stream normalization can replace the mock generator without rewriting row components.
-- `pulse/src/styles.css` maps the prototype to Orb tokens with the 1480 px shared shell, 18/14/12 px responsive gutters, 69 px desktop header, 61 px search rail, compact title/status header, profile summary band, 64 px monitor rows, fixed 40 px neutral NFT thumbnails, anchored settings popup, tokenized hover/focus/active states, `content-visibility` on table panels only, and reduced-motion handling.
+- `pulse/src/pulseData.ts` owns the mock feed and stats boundaries through `createInitialPulseFeed`, `createNextPulseFeed`, `buildPulseMetrics`, deterministic generated row factories, marketplace stats placeholders, 2-hour marketplace-volume buckets, floor-band listing-depth buckets, collection routing placeholders, a fixed visible-row cap, and the 4.5 second refresh constant so future stream, marketplace, DAS, and aggregator sources can replace mock data without rewriting row components.
+- `pulse/src/styles.css` maps the prototype to Orb tokens with the 1480 px shared shell, 18/14/12 px responsive gutters, 69 px desktop header, 61 px search rail, square 0 px visible UI corners, compact title/status header, profile summary band, continuous Paper-aligned marketplace graph and summary bands, tokenized Recharts surfaces/tooltips, marketplace stats tables, 64 px monitor rows, fixed 40 px neutral NFT/platform thumbnails, anchored settings popup, tokenized hover/focus/active states, CSS-only incoming row and metric refresh animations, `content-visibility` on table panels only, and reduced-motion handling.
 
 ## Portfolio Implementation Rules
 
@@ -228,17 +251,51 @@ Prototype source: `OM-PROT-002-portfolio`; not production evidence.
 - Mark `Me` as the active route semantically when the portfolio view is shown. The brand action may return to Pulse in the local prototype, but production route behavior remains unresolved.
 - Future wallet integrations need disconnected, loading, empty, hidden-wallet, stale, and indexer-error states that reserve the portfolio layout rather than collapsing the page.
 
+## Stats Implementation Rules
+
+Visual source: `OM-008-network-stats`; local alignment source: `OM-PROT-004-stats`.
+
+- Keep the `Stats` view in the shared app shell with search-first navigation and no sidebar or marketing header.
+- Lead the local `Stats` prototype with NFT marketplace stats: a KPI band, marketplace volume and listing-depth graphs, visual summary panels, marketplace overview table, and collection routing table for listing platforms such as Magic Eden, Tensor, OKX NFT, Exchange.Art, and Hyperspace.
+- Model marketplace stats with local types before integration: platform rows should include marketplace name, short label, source coverage, SOL volume, sales count, listing count, average sale, floor movement, and share; collection rows should include collection, top marketplace, floor, listings, sales, volume, and spread.
+- Treat local marketplace data as placeholder until marketplace APIs, DAS queries, indexer output, or aggregator sources are confirmed. Do not infer marketplace stats from the mock Pulse event feed.
+- Use the captured network stats visual language only as styling reference: shallow bordered bands, uppercase section titles, optional metric, info icon, and the three-line horizontal rule cluster. Keep the local Stats view scoped to NFT marketplace data.
+- Render local NFT marketplace graph fixtures through the shared Recharts adapter with grid lines, right-axis labels, bottom bucket labels, custom tooltip, `accessibilityLayer`, and accessible summaries. The volume graph should use 2-hour SOL-volume buckets; the listing-depth graph should use floor-band inventory buckets rather than another generic time line. Chart panels should follow the `3RV-0` sizing relationship: one continuous two-column band, 298 px panel height, shared outer border, vertical divider, large header metric derived from the plotted buckets, sparse body field, and footer metadata anchored to the lower edge. Keep chart panels stable when the renderer is lazy-loading, missing, loading, or no-data, and browser-QA any future production chart layer.
+- Render marketplace visual summaries with the `3Y3-0` distribution model: one continuous three-column band, shared outer border, vertical dividers, no card gaps, dominant first-panel value, compact middle-list content, and thicker square bars in the third panel.
+- Use fixed table layouts for marketplace overview and collection routing. Preserve row height, platform/collection identity width, numeric alignment, percentage formatting, and horizontal overflow during future refreshes.
+- Preserve native table semantics for marketplace and collection tables; stacked identity, value, and trend content must live inside inner wrappers.
+- Mark `Stats` as the active route semantically when the marketplace stats view is shown. The local prototype replaces the observed `Network` slot, but production route behavior remains unresolved.
+- Future marketplace integrations need loading, stale, partial-source, empty, and source-error states that reserve the NFT Stats layout rather than collapsing the page.
+
+## Private Payments API Landing Implementation Rules
+
+Prototype source: `OM-PROT-005-private-payments-api`; Paper node `3JV-0`.
+
+- Treat the Paper artboard as prototype guidance, not captured production evidence.
+- Current local implementation lives in `../eclipse (private-payments)` and uses Vite 8, React 19, TypeScript 6, and `lucide-react`.
+- Scope the current build to the active Paper tree: Helius nav clone plus hero/install command. Do not recreate older capability grids, workflow tabs, terminal previews, or footers unless they reappear in Paper or receive explicit content direction.
+- Keep the page on the shared black app canvas with the 1480 px rail, 18 px desktop gutter, 72 px Helius nav clone from Paper node `3OA-0`, IBM Plex Sans UI copy, Geist Mono command/terminal content, and square 0 px corners on command blocks, tiles, chips, terminal shells, and CTAs.
+- Current Paper state uses `Become invisible` as the hero headline over the Private Payments API value prop. Confirm whether production should keep that marketing headline or return the H1 to the product/page name for route clarity.
+- Use one primary command block per section. The hero now uses the terminal-style install pattern from Paper node `3R7-0`, adapted into node `4BN-0`; verify the command target before production implementation.
+- Implement command blocks with real buttons for copy/start actions, visible focus, copied/error feedback, and accessible labels that include the command purpose.
+- Keep capability tiles shallow: one border, one surface, mono glyph or approved icon, title, and short copy. Do not introduce shadows, nested cards, or decorative gradients.
+- If the workflow tabs become interactive, use semantic tabs or `aria-pressed` segmented buttons and keep the active treatment as selected fill/weight plus the red-orange primary accent.
+- Terminal previews should use redacted placeholder addresses, emails, signatures, and API keys. Never render real secrets in marketing/demo transcripts.
+- Keep Private Payments API facts current before implementation: supported transaction types, unsigned transaction format, swap routing behavior, mint initialization requirements, and authentication model may change.
+- Responsive implementation should collapse capability tiles to one column, keep command blocks readable, and allow terminal lines to wrap or scroll horizontally without changing section order.
+
 ## Pulse React Best-Practice Notes
 
 Apply the Vercel React best-practices skill when Pulse moves beyond static prototype data:
 
 - `bundle-barrel-imports`: import table, icon, formatter, and chart helpers directly so the monitor route does not pull unrelated UI code.
-- `bundle-conditional`: keep future heavy marketplace, charting, or diagnostics icon sets out of the initial monitor route until their panels are opened.
-- `bundle-dynamic-imports`: defer heavy charting, stream diagnostics, or marketplace-specific panels until the user opens them or the feature is enabled.
-- `async-parallel`: fetch independent DAS metadata, marketplace context, and account labels in parallel; start requests early and await only where the UI needs the result.
+- `bundle-conditional`: keep future heavy charting, validator diagnostics, marketplace, or stream-inspection icon sets out of the initial monitor route until their panels are opened.
+- `bundle-dynamic-imports`: defer heavy charting, stream diagnostics, validator diagnostics, or marketplace-specific panels until the user opens them or the feature is enabled. Pulse currently lazy-loads `StatsRechartsBarChart` so Recharts stays out of the initial monitor bundle.
+- `async-parallel`: fetch independent DAS metadata, network stats, validator context, marketplace context, and account labels in parallel; start requests early and await only where the UI needs the result.
 - `client-event-listeners`: keep one feed listener or subscription manager per live source, then distribute normalized events through local state rather than attaching listeners per table.
 - `rerender-memo`: memoize row components, expensive currency/relative-time formatting, and normalized identity objects once real event volume grows.
 - `rerender-functional-setstate`: use functional state updates for mock or real feed inserts so interval/listener callbacks do not depend on stale snapshots.
+- `rendering-animate-svg-wrapper`: animate row/cell wrappers and metric cells rather than SVG icons directly.
 - `rerender-dependencies`: base effects on primitive filter keys such as timeframe, marketplace, and collection address instead of whole filter objects.
 - `rerender-derived-state-no-effect`: derive active labels, empty-state flags, and status colors during render from event data instead of syncing extra state in effects.
 - `rendering-content-visibility`: use content visibility or windowing for below-fold monitor tables once row counts exceed the first viewport.

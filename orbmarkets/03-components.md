@@ -33,6 +33,7 @@ Each component should include:
 | Summary stat grid | Observed in `OM-005-token-detail` | 2 by 2 token stat matrix for Supply, Liquidity, Market Cap, and FDV. |
 | Token KPI band | Observed in `OM-005-token-detail` | Three-column Price, Holders, and 24H Volume metric strip. |
 | Time-series chart | Observed in `OM-005-token-detail` | Paper captured the shell; screenshot confirms red line, grid, axes, timeframe, mode, and live controls. |
+| Recharts chart adapter | Prototype in `OM-PROT-004-stats` | Tokenized Pulse adapter for Recharts bar charts; not production evidence. |
 | Entity tab bar | Observed in `OM-005-token-detail` | Markets, History, Holders, Metadata, Social. |
 | Top markets table | Observed in `OM-005-token-detail` | Token-specific market rows with liquidity, volume, trades, unique count, and pagination. |
 | Market item row | Observed in `OM-005-token-detail` | Individual token market row from Paper node `1HQ-0`; paired logos, venue subtitle, and fixed numeric columns. |
@@ -42,6 +43,22 @@ Each component should include:
 | Profile summary band | Prototype in `OM-PROT-002-portfolio` | Bordered wallet identity and signal band under `Me`; not production evidence. |
 | Portfolio holdings table | Prototype in `OM-PROT-002-portfolio` | Dense collection exposure table under `Me`; not production evidence. |
 | Portfolio activity table | Prototype in `OM-PROT-002-portfolio` | Dense wallet activity table under `Me`; not production evidence. |
+| Marketplace trend chart | Prototype in `OM-PROT-004-stats` | NFT marketplace-volume and listing-depth Recharts bar panels under `Stats`; not production evidence. |
+| Marketplace visual summary panel | Prototype in `OM-PROT-004-stats` | Platform share, collection volume, and floor momentum bars under `Stats`; not production evidence. |
+| Marketplace stats table | Prototype in `OM-PROT-004-stats` | Dense NFT listing-platform comparison table under `Stats`; not production evidence. |
+| Collection routing table | Prototype in `OM-PROT-004-stats` | Dense top-marketplace table for NFT collections under `Stats`; not production evidence. |
+| Network stats section header | Observed in `OM-008-network-stats` | Uppercase panel title, optional headline metric, info icon, and three-line rule cluster. |
+| Recent blocks panel | Observed in `OM-008-network-stats` | Compact block stream with leader, identity, transaction count, muted row, and pause action. |
+| Network chart panel | Observed in `OM-008-network-stats` | TPS and SOL price panels with headline values and compact controls; production evidence only, not used in local NFT Stats. |
+| Validator summary panels | Observed in `OM-008-network-stats` | Validator count, client distribution, and node version share bars. |
+| Active validators table | Observed in `OM-008-network-stats` | Dense validator table with toolbar, toggles, sorting, stake values, commission states, and pagination. |
+| Epoch status panel | Observed in `OM-008-network-stats` | Epoch progress bar, elapsed/remaining copy, slot links, and epoch constants. |
+| Developer landing header | Prototype in `OM-PROT-005-private-payments-api` | 72 px Helius nav clone from Paper node `3OA-0`; not production evidence. |
+| Developer command block | Prototype in `OM-PROT-005-private-payments-api` | Red-accent command surface for install commands, API examples, or copy actions. |
+| Developer tool chip | Prototype in `OM-PROT-005-private-payments-api` | Compact mono chips below the hero command for MCP, CLI, SDK, TypeScript SDK, Rust SDK, LaserStream, and Webhooks. |
+| Developer capability tile | Future Private Payments lower section | Shallow six-card developer capability grid is not present in the current `3JV-0` Paper tree; defer until redrawn. |
+| Developer workflow terminal | Future Private Payments lower section | Static terminal preview pattern is not present in the current `3JV-0` Paper tree; defer until redrawn. |
+| Developer workflow rail | Prototype in `OM-PROT-005-private-payments-api` | Four-step recommendation rail for developer workflows. |
 | Hash or address display | Pending capture | Truncation, copy action, link behavior, monospace usage. |
 | Score badge | Observed in `OM-001-home` | Hex grade badge for A/B/C market score. |
 | Status badge | Pending capture | Transaction status, validator status, risk or health states. |
@@ -69,6 +86,7 @@ Each component should include:
 - Responsive behavior: at desktop width, preserve a 69 px header height and keep search dominant. Do not wrap the nav row. Below the unresolved breakpoint, collapse secondary links before reducing search tap target quality.
 - Accessibility expectations: use a landmark `nav`, expose the search as a labeled input, give the utility/settings icon buttons accessible names, preserve visible focus rings, and mark active route/network state with semantic attributes plus selected text/fill treatment instead of relying only on color.
 - Implementation notes: build this as a reusable navigation component, with global search as a child component rather than duplicating search markup per route. Keep nav links text-based and compact; use icon buttons only for utility actions.
+- Prototype note: the local `/pulse` implementation now uses the observed secondary nav slot as a `Stats` route for mock NFT marketplace stats and borrows the compact panel styling from `OM-008-network-stats`; production naming between `Stats` and `Network` still needs route confirmation.
 - Production evidence: `OM-001-home`, Paper node `2-0`, source `https://app.paper.design/file/01KQ91NY8A16SXDG8G6QEJVM78/1-0/2-0`.
 
 ## Global Search
@@ -89,7 +107,7 @@ Each component should include:
 - Data constraints: setting labels and segment labels must truncate or fit inside the compact popup without changing row height.
 - Responsive behavior: desktop anchors to the settings icon; narrow viewports use a fixed inset popup and full-width segment groups.
 - Accessibility expectations: trigger exposes `aria-expanded`, `aria-controls`, and `aria-haspopup="dialog"`; popup renders as a labelled dialog, closes on Escape, and has a labelled close button.
-- Implementation notes: keep the popup to one visible shell with direct rows and subtle dividers, not nested cards. Do not wrap `Display`, `Density`, or `Network` rows in separate bordered containers, and do not wrap choices such as `Dark` and `System` in their own visible subcontainers. Use selected text fill/color and weight as the default selected marker for secondary settings controls. Reserve red-orange outlines for primary or production-confirmed main controls and visible focus treatment, not routine placeholder selection. Icons are Lucide-based, decorative beside visible labels, and sized small enough to preserve row density.
+- Implementation notes: keep the popup to one visible square-corner shell with direct rows and subtle dividers, not nested cards. Do not wrap `Display`, `Density`, or `Network` rows in separate bordered containers, and do not wrap choices such as `Dark` and `System` in their own visible subcontainers. Use selected text fill/color and weight as the default selected marker for secondary settings controls. Reserve red-orange outlines for primary or production-confirmed main controls and visible focus treatment, not routine placeholder selection. Icons are Lucide-based, decorative beside visible labels, and sized small enough to preserve row density.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## AI Analysis Popup
@@ -118,7 +136,7 @@ Each component should include:
 ## Assistant Handoff CTA
 
 - Purpose: route the user from a lightweight analysis prompt into the deeper Lana assistant path.
-- Anatomy: bordered rounded container, left dark icon tile, bold `Go deeper with Lana` label, and right diagonal arrow.
+- Anatomy: bordered square-corner container, left dark icon tile, bold `Go deeper with Lana` label, and right diagonal arrow.
 - States: default observed; hover, focus, pressed, loading, and unavailable states pending.
 - Data constraints: preserve enough horizontal room for the Lana label; if the assistant name changes, recheck the 380 px popup width.
 - Accessibility expectations: expose whether the action opens a new route, external destination, or assistant panel once behavior is confirmed.
@@ -162,6 +180,18 @@ Each component should include:
 - Implementation notes: treat the chart as a reusable shell with independently rendered data layers. Paper may not capture canvas-rendered series, so front-end QA must verify the rendered line, axes, grid, and tooltip in a browser.
 - Production evidence: `OM-005-token-detail`, Paper node `1AG-0`, user-supplied browser screenshot.
 
+## Recharts Chart Adapter
+
+- Purpose: give Pulse and future Orb prototype charts a shared Recharts implementation that still follows Orb chart tokens, spacing, and accessibility rules.
+- Anatomy: stable chart figure, lazy-loaded Recharts renderer, `ResponsiveContainer`, `BarChart`, horizontal `CartesianGrid`, bottom `XAxis`, right `YAxis`, tokenized `Bar`, black custom tooltip, non-visual summary, and stable loading fallback.
+- Variants: marketplace volume bars and listing-depth histogram bars in `OM-PROT-004-stats`; future line, area, and composed variants should reuse the same shell before adding new chart-library styling.
+- States: loaded, lazy-loading, hover/focus tooltip, reduced-motion-aware animation, no-data, stale, and source-error states. The current Pulse prototype implements loaded, lazy-loading, and hover/focus tooltip states.
+- Data constraints: chart data should be normalized to `{ label, value, detail }`-style points before it reaches the visual component. Axis labels and tooltip content must format through caller-provided `Intl` formatters so marketplace, token, and network charts do not hardcode number formats.
+- Responsive behavior: chart height is reserved by the surrounding panel; Recharts must resize inside that area without changing the Stats band height or moving footer metadata.
+- Accessibility expectations: enable Recharts `accessibilityLayer`, keep a labelled figure and hidden summary, expose tooltip values in visible text, preserve keyboard focus, and avoid relying only on bar color for meaning.
+- Implementation notes: use Orb CSS variables such as `--color-chart-grid`, `--color-chart-axis-text`, `--color-chart-bar`, `--color-chart-bar-hover`, and `--color-chart-cursor`; do not use generic `--chart-1`/`--chart-2` tokens unless they are mapped to Orb roles. Lazy-load heavy Recharts renderers from the route that needs them so the default monitor bundle does not pull chart code.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
 ## Entity Tab Bar
 
 - Purpose: switch between token-specific sections without leaving token context.
@@ -196,22 +226,22 @@ Each component should include:
 
 - Purpose: summarize a live or near-live event monitor without breaking the dense table workflow.
 - Anatomy: equal-width metric cells with label, value, and optional delta/status text.
-- States: derived mock-feed placeholder observed in `OM-PROT-001-pulse`; loading, stale, empty, and error states are future work.
+- States: derived mock-feed placeholder and refresh animation observed in `OM-PROT-001-pulse`; loading, stale, empty, and error states are future work.
 - Data constraints: metric values must truncate or scale within the cell without resizing neighboring cells. When metrics are derived from live or mock rows, recalculation must not change cell count or band height.
 - Responsive behavior: four columns on desktop, two columns on tablet, one column on narrow mobile.
 - Accessibility expectations: expose the strip as a labelled region and keep status/delta text readable without relying only on color.
-- Implementation notes: keep the strip as one bordered band with dividers, not a grid of floating cards. The current Pulse build uses fixed minimum cell height, tabular values, subtle Lucide icon tiles, responsive 4/2/1 column behavior, and KPI values derived from the current mock sales/listings snapshot.
+- Implementation notes: keep the strip as one bordered band with dividers, not a grid of floating cards. The current Pulse build uses fixed minimum cell height, tabular values, subtle Lucide icon tiles, responsive 4/2/1 column behavior, KPI values derived from the current mock sales/listings snapshot, and a CSS-only refresh pulse keyed by snapshot sequence.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## NFT Event Table
 
 - Purpose: scan recent NFT sales or listings in a monitor view shaped for future WebSocket or webhook event streams.
 - Anatomy: table title row, fixed table columns, NFT identity cell, marketplace, price, account identifiers, signature or listing ID, and timestamp.
-- States: populated and mock-refreshing placeholder observed in `OM-PROT-001-pulse`; hover, sorting, loading, empty, error, pinned, and paused-live states remain unresolved.
+- States: populated and mock-refreshing placeholder observed in `OM-PROT-001-pulse`; newest mock rows receive a short incoming animation. Hover, sorting, loading, empty, error, pinned, and paused-live states remain unresolved.
 - Data constraints: item names, collection names, addresses, signatures, listing IDs, and marketplace names must truncate without changing row height or column widths.
 - Responsive behavior: preserve columns through horizontal overflow at narrow widths rather than compressing values into unreadable fragments.
 - Accessibility expectations: use real table semantics, scoped headers, visible focus, and labelled links for item, account, signature, and listing targets.
-- Implementation notes: use a fixed table layout and stable row height so future live inserts do not cause layout shift. Collection names and main row/entity clickables should use the White or primary text role, `color.text.primary`; reserve secondary and muted text for supporting marketplace, account, signature, listing, and timestamp metadata. The current Pulse build uses 64 px rows, fixed column widths, horizontal overflow, memoized row components, Lucide icons in table headers, market/action pills, identifiers, timestamps, capped visible mock rows, and `content-visibility` on table panels. Batch or window incoming rows before rendering high-volume live feeds.
+- Implementation notes: use a fixed table layout and stable row height so future live inserts do not cause layout shift. Collection names and main row/entity clickables should use the White or primary text role, `color.text.primary`; reserve secondary and muted text for supporting marketplace, account, signature, listing, and timestamp metadata. The current Pulse build uses 64 px rows, fixed column widths, horizontal overflow, memoized row components, Lucide icons in table headers, square-corner market/action labels, identifiers, timestamps, capped visible mock rows, CSS-only incoming-row animation on table cells and inner content, and `content-visibility` on table panels. Batch or window incoming rows before rendering high-volume live feeds.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## NFT Identity Cell
@@ -222,6 +252,49 @@ Each component should include:
 - Data constraints: preserve item names before collection names. Collection names can truncate first but should not be demoted to muted metadata; render them in the White or primary text role, `color.text.primary`, when they identify or link to the collection.
 - Accessibility expectations: avoid redundant image alt text when adjacent text already names the item; row links need item and collection context.
 - Implementation notes: placeholder tiles must keep a fixed footprint so image loading or missing metadata does not alter row height. The current Pulse build uses a neutral 40 x 40 px tile instead of collection-tone fills, keeping strong color reserved for active controls and data status.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Marketplace Stats Table
+
+- Purpose: compare NFT listing platforms in the `Stats` view before live marketplace or aggregator sources are wired.
+- Anatomy: table title row, platform identity cell, market share, SOL volume, sales count, listing count, average sale, and 24H floor movement.
+- States: populated placeholder observed in `OM-PROT-004-stats`; sorting, platform filters, loading, stale, empty, and source-error states remain unresolved.
+- Data constraints: marketplace names, coverage descriptions, volume, sales, listings, and percentage deltas must truncate or format without changing row height or fixed column widths.
+- Responsive behavior: preserve platform, share, volume, listings, and floor movement through horizontal overflow before dropping less-critical coverage copy.
+- Accessibility expectations: use real table semantics, scoped headers, non-color text for positive/negative deltas, and accessible labels for inert marketplace links.
+- Implementation notes: reuse the dense table-panel rhythm, fixed columns, 64 px row cadence, primary text treatment for platform names, mono numeric values, and neutral platform logo tile from the Pulse monitor. Keep mock platform data separate from network stats so future ME, Tensor, OKX, Exchange.Art, Hyperspace, DAS, or aggregator integrations can replace it cleanly.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Marketplace Trend Chart
+
+- Purpose: make NFT marketplace activity more visual without introducing live network metrics.
+- Anatomy: stats-style panel header, three-line rule cluster, headline metric, Recharts bar or histogram buckets, grid lines, right-side y-axis labels, bottom x-axis labels, custom tooltip, accessible summary, and compact footer metadata.
+- Variants: 2-hour marketplace volume columns and floor-band listing-depth histogram.
+- States: rendered Recharts prototype graph fixtures observed in `OM-PROT-004-stats`; live, stale, no-data, and source-error states remain unresolved.
+- Data constraints: chart labels and values must not resize the panel. Real marketplace source changes should update the series without shifting surrounding cards or tables.
+- Accessibility expectations: each Recharts graph needs `accessibilityLayer`, a labelled figure, a non-visual summary, keyboard-reachable tooltip behavior where practical, and visible text that backs the visual encoding.
+- Implementation notes: reuse the captured `3RV-0` network stats panel rhythm, but keep the data strictly NFT marketplace related. Render marketplace graphs as one continuous two-column band with a shared outer border, vertical divider, 298 px panel height, large header metric derived from plotted buckets, sparse body, and footer metadata pinned to the lower edge. Style Recharts through the Orb chart adapter rather than ad hoc SVG geometry or generic chart palette variables. Do not show SOL price, TPS, validators, client distribution, or epoch data in the local Stats view.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Marketplace Visual Summary Panel
+
+- Purpose: summarize marketplace share, collection volume, and floor momentum before the user scans dense tables.
+- Anatomy: stats-style panel header, compact rows, mono values, horizontal share or momentum bars, and positive/negative text states.
+- Variants: platform share, collection volume, and floor momentum.
+- States: populated placeholder observed in `OM-PROT-004-stats`; filtering, loading, stale, empty, and source-error states remain unresolved.
+- Data constraints: marketplace and collection names must truncate before moving numeric values or changing panel height.
+- Implementation notes: follow the `3Y3-0` summary distribution: one continuous three-column band with shared outer border, vertical dividers, no card gaps, a dominant centered value in the first panel, a compact legend/list in the middle panel, and thicker square bars in the third panel. Bars are supporting visuals and must be backed by visible text.
+- Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
+
+## Collection Routing Table
+
+- Purpose: show which marketplace currently leads liquidity for tracked NFT collections in the `Stats` view.
+- Anatomy: table title row, collection identity cell, top marketplace label, floor, listing count, sales count, volume, and spread.
+- States: populated placeholder observed in `OM-PROT-004-stats`; collection filters, loading, stale, empty, and source-error states remain unresolved.
+- Data constraints: collection names, top-market labels, floor values, counts, volumes, and spreads must remain stable under refresh and truncate inside fixed columns.
+- Responsive behavior: preserve collection, top market, floor, volume, and spread through horizontal overflow on narrow viewports.
+- Accessibility expectations: keep native table semantics and include signed spread text so direction is not color-only.
+- Implementation notes: reuse the NFT identity cell and fixed table rhythm from monitor and portfolio tables. Collection names and primary collection links stay in `color.text.primary`/White; supporting listing counts and market labels can use secondary roles.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
 ## Table Cell Safety
@@ -266,13 +339,121 @@ Each component should include:
 - Implementation notes: keep portfolio activity visually equivalent to monitor events so wallet and live-feed tables share a common dense table contract. Keep stacked numeric content inside wrappers so `<td>` remains a table cell.
 - Prototype reference: [pulse.md](./pulse.md). This is not production evidence.
 
+## Network Stats Section Header
+
+- Purpose: give each network stats panel a compact title while preserving a dense dashboard rhythm.
+- Anatomy: uppercase title, optional headline metric, info icon, three-line horizontal rule cluster, and optional right-side control.
+- States: default observed; tooltip, loading, and error variants remain unresolved.
+- Data constraints: long titles should truncate before colliding with right-side controls. Headline metrics remain short and tabular.
+- Implementation notes: use this inside network stat panels only; it is a section header, not a card title pattern for marketing layouts.
+- Production evidence: `OM-008-network-stats`, Paper node `1ZQ-0`.
+
+## Recent Blocks Panel
+
+- Purpose: show current block production in a scan-friendly stream.
+- Anatomy: header with pause control, block rows, block number, leader name, truncated leader identity, and transaction count.
+- States: populated and one muted row observed; paused, resumed, stale, empty, and error states remain unresolved.
+- Data constraints: block numbers, leader names, identities, and tx counts must not change row height during refresh.
+- Accessibility expectations: expose the pause action as a labelled button and preserve full leader identity in link labels or titles.
+- Implementation notes: rows can animate on refresh, but row dimensions, scroll position, and focus must remain stable.
+- Production evidence: `OM-008-network-stats`, child node `1ZT-0`.
+
+## Network Chart Panel
+
+- Purpose: reserve chart real estate for chain activity and price movement while keeping headline values visible.
+- Anatomy: 667 x 298 px panel unit with uppercase title, info icon, large headline metric, three-line rule cluster, sparse chart field, secondary metric label, bottom metadata line, checkbox toggle, or compact timeframe controls.
+- Variants: Network TPS and SOL price.
+- States: populated headline with chart shell observed in Paper; the local Stats prototype uses this rhythm for marketplace Recharts bars with axis labels, custom tooltips, and accessible summaries. Loading, no-data, stale, and error states remain unresolved.
+- Data constraints: chart axes and values must fit without moving controls during live updates. Header metrics should stay in the header group; footer metadata and toggles stay anchored to the bottom edge.
+- Accessibility expectations: toggles and timeframe buttons need semantic state; chart content needs a labelled chart region, keyboard-reachable data where practical, and a non-visual summary.
+- Production evidence: `OM-008-network-stats`, child node `1ZT-0`.
+
+## Validator Summary Panels
+
+- Purpose: summarize validator count, client concentration, and node version distribution before the user reads the full table.
+- Anatomy: one continuous three-column band with vertical dividers; large centered validator count in the first column; client legend rows positioned in the lower-middle of the second column; node version label/value rows with thick square horizontal share bars in the third column.
+- States: populated observed; loading, zero, partial-source, and stale states remain unresolved.
+- Data constraints: percentages and version strings must truncate or wrap inside the panel without changing the three-panel row height.
+- Implementation notes: color dots are data markers; include client names and percentages in text so meaning is not color-only. Do not render validator summaries as separate floating cards with gaps.
+- Production evidence: `OM-008-network-stats`, child node `1ZT-0`.
+
+## Active Validators Table
+
+- Purpose: let users compare validator stake, version, APY, weight, and commission at network scale.
+- Anatomy: title/toolbar row, total count copy, active-only toggle, grid button, sortable headers, validator identity cell, APY, active stake, stake weight, commission, and pagination.
+- States: populated table observed; sorting, filtered, grid mode, row hover, selected row, loading, empty, stale, and error states remain unresolved.
+- Data constraints: validator names, identities, versions, stake values, and percentages must fit fixed columns. Commission color must be backed by text.
+- Responsive behavior: keep native table semantics and horizontal overflow at narrow widths.
+- Accessibility expectations: use scoped headers, labelled sort controls, labelled toggles, non-color commission state, and labelled pagination.
+- Implementation notes: validator data can grow large; memoize rows and use windowing or content visibility when needed. Do not apply flex or grid display to native table rows or cells.
+- Production evidence: `OM-008-network-stats`, child node `24E-0`.
+
+## Validator Identity Cell
+
+- Purpose: identify one validator in the active validators table.
+- Anatomy: fixed logo or placeholder, primary validator name, and muted identity/version metadata.
+- States: populated observed; missing logo, unverified name, delinquent, and inactive variants remain unresolved.
+- Data constraints: preserve the validator name first, then truncate identity/version metadata.
+- Implementation notes: keep the logo footprint fixed so real logos and placeholders do not change row height.
+- Production evidence: `OM-008-network-stats`, child node `24E-0`.
+
+## Epoch Status Panel
+
+- Purpose: show where the network is within the current epoch and expose slot-level context.
+- Anatomy: epoch header, progress bar, elapsed/remaining copy, started timestamp, start/current/elapsed slot values, epochs per year, slots in epoch, and estimated duration.
+- States: populated observed; near-boundary epoch transition, stale, loading, and RPC-error states remain unresolved.
+- Data constraints: large slot values must use tabular formatting and must not resize the panel.
+- Accessibility expectations: progress needs an accessible label; slot links need full-value labels and should not rely only on external-link icons.
+- Production evidence: `OM-008-network-stats`, child node `2G3-0`.
+
+## Developer Command Block
+
+- Purpose: make install/setup commands the primary action on developer landing pages.
+- Anatomy: shallow black command shell, compact terminal chrome when used as the hero install block, mono label, mono command text, red-orange accent border, and compact copy/start action.
+- Variants: install command terminal, API request example, SDK install, MCP install, plugin install, CLI signup, generic config snippet.
+- States: default prototype observed; copied, copy-error, focus, hover, loading, and disabled states remain unresolved.
+- Data constraints: commands can be long and must truncate or wrap without changing the block height unexpectedly.
+- Accessibility expectations: copy buttons need explicit labels such as `Copy Private Payments API request example` and copied/error feedback.
+- Implementation notes: use red-orange only for the primary command in the section. Secondary commands should use subtle borders unless they are the main CTA. The current Private Payments hero uses source node `3R7-0` adapted into replacement node `4BN-0`.
+- Local implementation: `../eclipse (private-payments)` renders this as a real copyable command block with copied-state feedback.
+- Prototype reference: `OM-PROT-005-private-payments-api`, Paper node `3JV-0`; install source node `3R7-0`.
+
+## Developer Tool Chip
+
+- Purpose: identify supported Helius setup surfaces without turning the hero into a full product matrix.
+- Anatomy: shallow black chip, subtle border, mono label.
+- Variants: MCP, CLI, SDK, TypeScript SDK, Rust SDK, LaserStream, Webhooks.
+- States: static prototype observed; hover/link states remain unresolved.
+- Data constraints: longer SDK names should wrap or move to the next chip row without resizing the command block.
+- Implementation notes: treat chips as secondary labels unless route targets are confirmed. Keep the square-corner treatment and do not add icons or colored status dots to every chip.
+- Prototype reference: `OM-PROT-005-private-payments-api`, Paper node `3JV-0`.
+
+## Developer Capability Tile
+
+- Purpose: summarize one developer-facing Helius primitive in a compact landing-page grid.
+- Anatomy: mono glyph or future icon, primary title, short utility copy, shallow black surface, and subtle border.
+- Variants: unresolved for Private Payments API; the current Paper tree does not include capability tiles.
+- States: static prototype observed; hover, focus, link, selected, and disabled states remain unresolved.
+- Data constraints: titles should stay one line where practical; body copy should stay within two to three compact lines.
+- Implementation notes: keep tiles shallow and avoid decorative images unless approved product logos are used. Do not nest cards inside tiles.
+- Prototype reference: `OM-PROT-005-private-payments-api`, Paper node `3JV-0`.
+
+## Developer Workflow Terminal
+
+- Purpose: show how a developer or agent can execute a Helius setup, API, or transaction-building workflow without leaving the page.
+- Anatomy: terminal shell, small title bar, status dots, mono command/output transcript, and optional adjacent workflow rail.
+- States: future pattern only for the Private Payments API; running, success, error, copied, and expanded states remain unresolved.
+- Data constraints: generated examples should be plausible but not expose real keys, emails, wallets, or signatures.
+- Accessibility expectations: terminal content should be supplemented by normal text instructions when it is essential to the flow.
+- Prototype reference: `OM-PROT-005-private-payments-api`, Paper node `3JV-0`.
+
 ## Category Tabs
 
 - Purpose: switch the home market table between watchlist and market categories.
 - Anatomy: text-only tabs with underline active state.
 - Variants: Watchlist, Trending, Majors, DeFi, Stocks, Commodities, Cults.
 - States: active and inactive observed; hover and focus pending.
-- Implementation notes: active state uses selected text fill and underline, not color alone. Do not turn category tabs into outlined pills unless production confirms that treatment.
+- Implementation notes: active state uses selected text fill and underline, not color alone. Do not turn category tabs into pill-style controls or outlined button groups.
 - Production evidence: `OM-001-home`.
 
 ## Market Data Table

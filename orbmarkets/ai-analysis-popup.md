@@ -40,7 +40,7 @@ The popup introduces AI-generated token analysis without leaving the current tok
 - Border: outer modal uses a red accent stroke; header divider and secondary CTA border use low-contrast charcoal.
 - Typography: title and content use IBM Plex Sans; the primary `Analyze` label appears in Geist Mono for a technical action tone.
 - Iconography: red AI icon in the header, white AI icon inside the primary button, muted close icon, left arrow-stack mark, and a diagonal arrow for the secondary CTA.
-- Radius: modal corners are small to medium, roughly 8 px; inner CTA radius is similar; primary button corners are sharp or minimally rounded.
+- Corner treatment: correction from Orb direction - modal shell, inner CTA, icon tile, close button, and primary button should use 0 px square corners.
 - Spacing: header is compact; body content is centered with generous vertical gaps between copy, primary action, and secondary CTA.
 - Density: compact and focused. Do not add extra metadata, cards, or helper text inside this popup unless production confirms it.
 

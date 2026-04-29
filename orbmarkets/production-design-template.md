@@ -42,7 +42,7 @@ Describe what the user is trying to accomplish on this screen.
 - Border:
 - Typography:
 - Iconography:
-- Radius:
+- Corner treatment:
 - Spacing:
 - Density:
 
@@ -83,4 +83,3 @@ Describe what the user is trying to accomplish on this screen.
 - Update `04-page-patterns.md` if a reusable layout pattern is observed.
 - Update `05-interaction-motion.md` if behavior or motion is confirmed.
 - Update `06-frontend-implementation.md` if engineering rules change.
-

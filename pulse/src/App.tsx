@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   Activity as ActivityIcon,
@@ -12,9 +12,9 @@ import {
   Gem as GemIcon,
   Globe2 as GlobeIcon,
   Hash as HashIcon,
+  Info as InfoIcon,
   ListFilter as ListFilterIcon,
   Monitor as MonitorIcon,
-  Network as NetworkIcon,
   Search as SearchIcon,
   Settings as SettingsIcon,
   SlidersHorizontal as SlidersHorizontalIcon,
@@ -27,6 +27,7 @@ import {
   Zap as ZapIcon,
 } from 'lucide-react';
 import type {
+  ChartSeriesPoint,
   EventStatus,
   NftListingEvent,
   NftSaleEvent,
@@ -40,6 +41,11 @@ import {
   buildPulseMetrics,
   createInitialPulseFeed,
   createNextPulseFeed,
+  marketplaceCollectionStats,
+  marketplaceListingSeries,
+  marketplaceMetrics,
+  marketplaceStats,
+  marketplaceVolumeSeries,
   portfolioActivity,
   portfolioHoldings,
   portfolioMetrics,
@@ -48,7 +54,16 @@ import {
 } from './pulseData';
 
 const ACTIVE_TIME_WINDOW = '24H';
-type ViewMode = 'pulse' | 'portfolio';
+type ViewMode = 'pulse' | 'portfolio' | 'stats';
+type MarketplaceStat = (typeof marketplaceStats)[number];
+type MarketplaceCollectionStat = (typeof marketplaceCollectionStats)[number];
+type ChartTone = 'volume' | 'listings';
+
+const StatsRechartsBarChart = lazy(async () => {
+  const module = await import('./StatsRechartsBarChart');
+
+  return { default: module.StatsRechartsBarChart };
+});
 
 const solFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
@@ -129,7 +144,7 @@ function App() {
         onToggleSettings={toggleSettings}
       />
       <main className="pulse-main">
-        {activeView === 'portfolio' ? <PortfolioPage /> : <PulsePage />}
+        {activeView === 'portfolio' ? <PortfolioPage /> : activeView === 'stats' ? <StatsPage /> : <PulsePage />}
       </main>
     </div>
   );
@@ -180,9 +195,14 @@ const TopNavigation = memo(function TopNavigation({
           <UserRoundIcon aria-hidden="true" />
           <span>Me</span>
         </button>
-        <button className="nav-link nav-button" type="button">
-          <NetworkIcon aria-hidden="true" />
-          <span>Network</span>
+        <button
+          aria-current={activeView === 'stats' ? 'page' : undefined}
+          className={`nav-link nav-button ${activeView === 'stats' ? 'is-active' : ''}`}
+          type="button"
+          onClick={() => onNavigate('stats')}
+        >
+          <ChartColumnIcon aria-hidden="true" />
+          <span>Stats</span>
         </button>
         <div className="settings-control">
           <button
@@ -314,10 +334,10 @@ function PulsePage() {
   return (
     <>
       <PulseHeader updatedAt={feed.updatedAt} />
-      <MetricStrip ariaLabel="Pulse metrics" metrics={metrics} />
+      <MetricStrip ariaLabel="Pulse metrics" metrics={metrics} updateSequence={feed.sequence} />
       <section className="monitor-grid" aria-label="NFT event monitor tables">
-        <SalesTable sales={feed.sales} />
-        <ListingsTable listings={feed.listings} />
+        <SalesTable sales={feed.sales} updateSequence={feed.sequence} />
+        <ListingsTable listings={feed.listings} updateSequence={feed.sequence} />
       </section>
     </>
   );
@@ -375,6 +395,61 @@ function PortfolioPage() {
   );
 }
 
+function StatsPage() {
+  return (
+    <section className="stats-page" aria-label="NFT marketplace stats">
+      <section className="pulse-header" aria-labelledby="stats-title">
+        <div className="title-stack">
+          <div className="title-line">
+            <span className="page-title-mark" aria-hidden="true">
+              <ChartColumnIcon />
+            </span>
+            <h1 id="stats-title">Stats</h1>
+            <span className="live-pill">
+              <StoreIcon aria-hidden="true" />
+              NFT markets
+            </span>
+          </div>
+          <span className="status-meta">Marketplace volume, depth, and routing across ME, Tensor, OKX, and more</span>
+        </div>
+        <TimeWindowControl ariaLabel="NFT marketplace stats time window" />
+      </section>
+      <MetricStrip ariaLabel="NFT marketplace stats metrics" metrics={marketplaceMetrics} />
+      <section className="stats-split-grid" aria-label="NFT marketplace trend charts">
+        <MarketplaceGraphPanel
+          axisFormatter={(value) => integerFormatter.format(value)}
+          chartLabel="24H SOL volume"
+          metric={formatSol(sumSeriesValues(marketplaceVolumeSeries))}
+          series={marketplaceVolumeSeries}
+          sourceLabel="2H marketplace buckets"
+          title="Marketplace volume"
+          tone="volume"
+          valueFormatter={formatSol}
+        />
+        <MarketplaceGraphPanel
+          axisFormatter={(value) => integerFormatter.format(value)}
+          chartLabel="Listings by floor band"
+          metric={integerFormatter.format(sumSeriesValues(marketplaceListingSeries))}
+          series={marketplaceListingSeries}
+          sourceLabel="Floor-band depth"
+          title="Listing depth"
+          tone="listings"
+          valueFormatter={(value) => `${integerFormatter.format(value)} listings`}
+        />
+      </section>
+      <section className="stats-card-grid" aria-label="NFT marketplace visual summaries">
+        <MarketplaceSharePanel stats={marketplaceStats} />
+        <CollectionVolumePanel collections={marketplaceCollectionStats} />
+        <FloorMomentumPanel stats={marketplaceStats} />
+      </section>
+      <section className="monitor-grid" aria-label="NFT marketplace stats tables">
+        <MarketplaceStatsTable stats={marketplaceStats} />
+        <MarketplaceCollectionsTable collections={marketplaceCollectionStats} />
+      </section>
+    </section>
+  );
+}
+
 const TimeWindowControl = memo(function TimeWindowControl({ ariaLabel }: { ariaLabel: string }) {
   return (
     <div className="window-control" aria-label={ariaLabel}>
@@ -420,11 +495,24 @@ function ProfileBand({ profile }: { profile: PortfolioProfile }) {
   );
 }
 
-function MetricStrip({ ariaLabel, metrics }: { ariaLabel: string; metrics: PulseMetric[] }) {
+function MetricStrip({
+  ariaLabel,
+  metrics,
+  updateSequence = 0,
+}: {
+  ariaLabel: string;
+  metrics: PulseMetric[];
+  updateSequence?: number;
+}) {
+  const isUpdating = updateSequence > 0;
+
   return (
     <section className="metric-strip" aria-label={ariaLabel}>
       {metrics.map((metric) => (
-        <article className="metric-cell" key={metric.label}>
+        <article
+          className={`metric-cell ${isUpdating ? 'is-updating' : ''}`}
+          key={`${metric.label}-${updateSequence}`}
+        >
           <span className="metric-icon" aria-hidden="true">
             <MetricIcon label={metric.label} status={metric.status} />
           </span>
@@ -507,7 +595,239 @@ function PortfolioActivityTable({ activity }: { activity: PortfolioActivity[] })
   );
 }
 
-function SalesTable({ sales }: { sales: NftSaleEvent[] }) {
+function MarketplaceStatsTable({ stats }: { stats: MarketplaceStat[] }) {
+  return (
+    <section className="table-panel" aria-labelledby="marketplace-overview-title">
+      <TableHeader title="Marketplace overview" count={stats.length} countLabel="platforms" />
+      <div className="table-scroll">
+        <table>
+          <colgroup>
+            <col className="col-platform" />
+            <col className="col-share" />
+            <col className="col-price" />
+            <col className="col-delta" />
+            <col className="col-delta" />
+            <col className="col-price" />
+            <col className="col-delta" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Platform</th>
+              <th scope="col">Share</th>
+              <th scope="col">Volume</th>
+              <th scope="col">Sales</th>
+              <th scope="col">Listings</th>
+              <th scope="col">Avg sale</th>
+              <th scope="col">Floor 24H</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stats.map((stat) => (
+              <MarketplaceStatsRow key={stat.id} stat={stat} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function MarketplaceCollectionsTable({ collections }: { collections: MarketplaceCollectionStat[] }) {
+  return (
+    <section className="table-panel" aria-labelledby="collection-routing-title">
+      <TableHeader title="Collection routing" count={collections.length} countLabel="collections" />
+      <div className="table-scroll">
+        <table>
+          <colgroup>
+            <col className="col-asset" />
+            <col className="col-market" />
+            <col className="col-price" />
+            <col className="col-delta" />
+            <col className="col-delta" />
+            <col className="col-price" />
+            <col className="col-delta" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Collection</th>
+              <th scope="col">Top market</th>
+              <th scope="col">Floor</th>
+              <th scope="col">Listings</th>
+              <th scope="col">Sales</th>
+              <th scope="col">Volume</th>
+              <th scope="col">Spread</th>
+            </tr>
+          </thead>
+          <tbody>
+            {collections.map((collection) => (
+              <MarketplaceCollectionRow collection={collection} key={collection.id} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function MarketplaceSharePanel({ stats }: { stats: MarketplaceStat[] }) {
+  const topMarketplace = getTopMarketplace(stats);
+
+  return (
+    <section className="stats-panel marketplace-visual-panel" aria-labelledby="marketplace-share-title">
+      <StatsPanelHeader title="Platform share" />
+      <h2 className="visually-hidden" id="marketplace-share-title">
+        Platform share
+      </h2>
+      <div className="marketplace-leader-body">
+        <strong>{formatPercent(topMarketplace.share)}</strong>
+        <span>{topMarketplace.marketplace} leads visible marketplace share</span>
+      </div>
+    </section>
+  );
+}
+
+function CollectionVolumePanel({ collections }: { collections: MarketplaceCollectionStat[] }) {
+  const totalVolume = collections.reduce((sum, collection) => sum + collection.volumeSol, 0);
+
+  return (
+    <section className="stats-panel marketplace-visual-panel" aria-labelledby="collection-volume-title">
+      <StatsPanelHeader title="Collection volume" />
+      <h2 className="visually-hidden" id="collection-volume-title">
+        Collection volume
+      </h2>
+      <div className="marketplace-visual-list">
+        {collections.map((collection) => {
+          const share = totalVolume > 0 ? (collection.volumeSol / totalVolume) * 100 : 0;
+
+          return (
+            <div className="marketplace-visual-row" key={collection.id}>
+              <span>{collection.collection}</span>
+              <strong>{formatSol(collection.volumeSol)}</strong>
+              <i className="marketplace-share-bar" aria-hidden="true">
+                <i style={{ width: `${share}%` }} />
+              </i>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function FloorMomentumPanel({ stats }: { stats: MarketplaceStat[] }) {
+  const maxMove = Math.max(...stats.map((stat) => Math.abs(stat.floorDelta)), 1);
+
+  return (
+    <section className="stats-panel marketplace-visual-panel" aria-labelledby="floor-momentum-title">
+      <StatsPanelHeader title="Floor momentum" />
+      <h2 className="visually-hidden" id="floor-momentum-title">
+        Floor momentum
+      </h2>
+      <div className="floor-momentum-list">
+        {stats.map((stat) => {
+          const width = (Math.abs(stat.floorDelta) / maxMove) * 100;
+
+          return (
+            <div className={stat.floorDelta >= 0 ? 'floor-momentum-row positive' : 'floor-momentum-row negative'} key={stat.id}>
+              <span>{stat.marketplace}</span>
+              <strong>{formatDelta(stat.floorDelta)}</strong>
+              <i className="floor-momentum-track" aria-hidden="true">
+                <i style={{ width: `${width}%` }} />
+              </i>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function StatsPanelHeader({
+  action,
+  metric,
+  title,
+}: {
+  action?: ReactNode;
+  metric?: string;
+  title: string;
+}) {
+  return (
+    <header className="stats-panel-header">
+      <span className="stats-panel-title">
+        {title}
+        <InfoIcon aria-hidden="true" />
+        {metric ? <strong>{metric}</strong> : null}
+      </span>
+      <span className="stats-panel-rule" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </span>
+      {action ? <span className="stats-panel-action">{action}</span> : null}
+    </header>
+  );
+}
+
+function MarketplaceGraphPanel({
+  axisFormatter,
+  chartLabel,
+  metric,
+  series,
+  sourceLabel,
+  title,
+  tone,
+  valueFormatter,
+}: {
+  axisFormatter: (value: number) => string;
+  chartLabel: string;
+  metric: string;
+  series: ChartSeriesPoint[];
+  sourceLabel: string;
+  title: string;
+  tone: ChartTone;
+  valueFormatter: (value: number) => string;
+}) {
+  const peak = getPeakPoint(series);
+  const bucketLabel = tone === 'volume' ? 'time bucket' : 'floor band';
+  const summary = peak
+    ? `${title} plots ${valueFormatter(sumSeriesValues(series))} across ${series.length} ${bucketLabel}s. The highest ${bucketLabel} is ${peak.label} at ${valueFormatter(peak.value)}.`
+    : `${title} has no plotted marketplace data for the selected window.`;
+
+  return (
+    <section className="stats-panel chart-panel" aria-labelledby={`${tone}-chart-title`}>
+      <StatsPanelHeader metric={metric} title={title} />
+      <h2 className="visually-hidden" id={`${tone}-chart-title`}>
+        {title}
+      </h2>
+      <div className="stats-chart-body">
+        <span className="stats-chart-label">{chartLabel}</span>
+        <Suspense
+          fallback={
+            <div className={`stats-recharts ${tone} is-loading`} role="status">
+              <span className="visually-hidden">Loading {title} chart…</span>
+            </div>
+          }
+        >
+          <StatsRechartsBarChart
+            axisFormatter={axisFormatter}
+            chartId={`${tone}-chart`}
+            label={`${title} over the selected NFT marketplace window`}
+            points={series}
+            summary={summary}
+            tone={tone}
+            valueFormatter={valueFormatter}
+          />
+        </Suspense>
+      </div>
+      <footer className="chart-footer">
+        <span className="chart-legend">Last 24H</span>
+        <span className="chart-legend">{sourceLabel}</span>
+      </footer>
+    </section>
+  );
+}
+
+function SalesTable({ sales, updateSequence }: { sales: NftSaleEvent[]; updateSequence: number }) {
   return (
     <section className="table-panel" aria-labelledby="latest-sales-title">
       <TableHeader title="Latest sales" count={sales.length} />
@@ -534,8 +854,8 @@ function SalesTable({ sales }: { sales: NftSaleEvent[] }) {
             </tr>
           </thead>
           <tbody>
-            {sales.map((sale) => (
-              <SalesRow key={sale.id} sale={sale} />
+            {sales.map((sale, index) => (
+              <SalesRow key={sale.id} isIncoming={updateSequence > 0 && index === 0} sale={sale} />
             ))}
           </tbody>
         </table>
@@ -544,7 +864,7 @@ function SalesTable({ sales }: { sales: NftSaleEvent[] }) {
   );
 }
 
-function ListingsTable({ listings }: { listings: NftListingEvent[] }) {
+function ListingsTable({ listings, updateSequence }: { listings: NftListingEvent[]; updateSequence: number }) {
   return (
     <section className="table-panel" aria-labelledby="latest-listings-title">
       <TableHeader title="Latest listings" count={listings.length} />
@@ -571,8 +891,8 @@ function ListingsTable({ listings }: { listings: NftListingEvent[] }) {
             </tr>
           </thead>
           <tbody>
-            {listings.map((listing) => (
-              <ListingRow key={listing.id} listing={listing} />
+            {listings.map((listing, index) => (
+              <ListingRow key={listing.id} isIncoming={updateSequence > 0 && index === 0} listing={listing} />
             ))}
           </tbody>
         </table>
@@ -581,9 +901,15 @@ function ListingsTable({ listings }: { listings: NftListingEvent[] }) {
   );
 }
 
-const SalesRow = memo(function SalesRow({ sale }: { sale: NftSaleEvent }) {
+const SalesRow = memo(function SalesRow({
+  isIncoming,
+  sale,
+}: {
+  isIncoming: boolean;
+  sale: NftSaleEvent;
+}) {
   return (
-    <tr>
+    <tr className={isIncoming ? 'row-incoming' : undefined}>
       <td>
         <NftIdentity
           initials={sale.imagePlaceholder.initials}
@@ -614,9 +940,15 @@ const SalesRow = memo(function SalesRow({ sale }: { sale: NftSaleEvent }) {
   );
 });
 
-const ListingRow = memo(function ListingRow({ listing }: { listing: NftListingEvent }) {
+const ListingRow = memo(function ListingRow({
+  isIncoming,
+  listing,
+}: {
+  isIncoming: boolean;
+  listing: NftListingEvent;
+}) {
   return (
-    <tr>
+    <tr className={isIncoming ? 'row-incoming' : undefined}>
       <td>
         <NftIdentity
           initials={listing.imagePlaceholder.initials}
@@ -644,6 +976,72 @@ const ListingRow = memo(function ListingRow({ listing }: { listing: NftListingEv
       </td>
       <td>
         <EventTime value={listing.timestamp} />
+      </td>
+    </tr>
+  );
+});
+
+const MarketplaceStatsRow = memo(function MarketplaceStatsRow({ stat }: { stat: MarketplaceStat }) {
+  return (
+    <tr>
+      <td>
+        <PlatformIdentity
+          label={`${stat.marketplace} marketplace stats`}
+          primary={stat.marketplace}
+          secondary={stat.coverage}
+          shortName={stat.shortName}
+        />
+      </td>
+      <td>
+        <span className="share-value">{formatPercent(stat.share)}</span>
+      </td>
+      <td>
+        <NumericStack primary={formatSol(stat.volumeSol)} />
+      </td>
+      <td>{integerFormatter.format(stat.salesCount)}</td>
+      <td>{integerFormatter.format(stat.listingCount)}</td>
+      <td>
+        <NumericStack primary={formatSol(stat.averageSaleSol)} />
+      </td>
+      <td>
+        <span className={stat.floorDelta >= 0 ? 'delta-positive' : 'delta-negative'}>
+          {formatDelta(stat.floorDelta)}
+        </span>
+      </td>
+    </tr>
+  );
+});
+
+const MarketplaceCollectionRow = memo(function MarketplaceCollectionRow({
+  collection,
+}: {
+  collection: MarketplaceCollectionStat;
+}) {
+  return (
+    <tr>
+      <td>
+        <NftIdentity
+          initials={getInitials(collection.collection)}
+          label={`${collection.collection} marketplace routing stats`}
+          primary={collection.collection}
+          secondary={`${integerFormatter.format(collection.listingCount)} active listings`}
+        />
+      </td>
+      <td>
+        <IconPill icon={StoreIcon} label={collection.topMarketplace} />
+      </td>
+      <td>
+        <NumericStack primary={formatSol(collection.floorSol)} />
+      </td>
+      <td>{integerFormatter.format(collection.listingCount)}</td>
+      <td>{integerFormatter.format(collection.salesCount)}</td>
+      <td>
+        <NumericStack primary={formatSol(collection.volumeSol)} />
+      </td>
+      <td>
+        <span className={collection.spread >= 0 ? 'delta-positive' : 'delta-negative'}>
+          {formatDelta(collection.spread)}
+        </span>
       </td>
     </tr>
   );
@@ -770,6 +1168,33 @@ function NftIdentity({
   );
 }
 
+function PlatformIdentity({
+  label,
+  primary,
+  secondary,
+  shortName,
+}: {
+  label: string;
+  primary: string;
+  secondary: string;
+  shortName: string;
+}) {
+  return (
+    <div className="platform-identity">
+      <span className="platform-logo" aria-hidden="true">
+        {shortName}
+      </span>
+      <span className="identity-copy">
+        <a className="identity-link" href="#" aria-label={label}>
+          <StoreIcon aria-hidden="true" />
+          <span>{primary}</span>
+        </a>
+        <span>{secondary}</span>
+      </span>
+    </div>
+  );
+}
+
 function AddressLink({ value, label }: { value: string; label: string }) {
   return (
     <a className="mono-link" href="#" aria-label={label} title={value}>
@@ -839,6 +1264,14 @@ function getProfileSignalIcon(label: string, status?: EventStatus): LucideIcon {
 function getTableIcon(title: string): LucideIcon {
   const normalized = title.toLowerCase();
 
+  if (normalized.includes('marketplace') || normalized.includes('market')) {
+    return StoreIcon;
+  }
+
+  if (normalized.includes('collection')) {
+    return GemIcon;
+  }
+
   if (normalized.includes('sales')) {
     return BadgeDollarSignIcon;
   }
@@ -876,6 +1309,26 @@ function formatSol(value: number) {
 
 function formatDelta(value: number) {
   return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+}
+
+function formatPercent(value: number, fractionDigits = 1) {
+  return `${value.toFixed(fractionDigits)}%`;
+}
+
+function getTopMarketplace(stats: MarketplaceStat[]) {
+  return stats.reduce((current, stat) => (stat.share > current.share ? stat : current));
+}
+
+function sumSeriesValues(points: ChartSeriesPoint[]) {
+  return points.reduce((total, point) => total + point.value, 0);
+}
+
+function getPeakPoint(points: ChartSeriesPoint[]) {
+  if (points.length === 0) {
+    return undefined;
+  }
+
+  return points.reduce((current, point) => (point.value > current.value ? point : current), points[0]);
 }
 
 function getInitials(value: string) {

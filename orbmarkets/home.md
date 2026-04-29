@@ -42,7 +42,7 @@ The home screen is a dense market scanning surface. Users search for tokens, swi
 - Border: table, header, row dividers, segmented controls, tooltip, and buttons use thin low-contrast borders.
 - Typography: IBM Plex Sans and Geist Mono are present. Token symbols use bold uppercase styling; secondary labels and compact chips use a more technical mono treatment.
 - Iconography: thin line icons for search, copy, settings, stars, and chevrons; token logos are circular image assets.
-- Radius: controls use small radii, roughly 4-6 px; token logos are circular; score badges use angular hex forms.
+- Corner treatment: visible controls use 0 px square corners; token logos remain circular image assets; score badges use angular hex forms.
 - Spacing: the table is dense but readable, with wide column gutters and compact header controls.
 - Density: table density is high; avoid oversized padding or card layouts in this screen.
 

@@ -1,4 +1,5 @@
 import type {
+  ChartSeriesPoint,
   NftListingEvent,
   NftSaleEvent,
   PortfolioActivity,
@@ -7,6 +8,30 @@ import type {
   PulseFeedSnapshot,
   PulseMetric,
 } from './types';
+
+type MarketplaceStat = {
+  id: string;
+  marketplace: string;
+  shortName: string;
+  coverage: string;
+  volumeSol: number;
+  salesCount: number;
+  listingCount: number;
+  averageSaleSol: number;
+  floorDelta: number;
+  share: number;
+};
+
+type MarketplaceCollectionStat = {
+  id: string;
+  collection: string;
+  topMarketplace: string;
+  floorSol: number;
+  listingCount: number;
+  salesCount: number;
+  volumeSol: number;
+  spread: number;
+};
 
 export const timeWindows = ['5m', '1H', '24H', '7D'] as const;
 
@@ -148,6 +173,174 @@ export const portfolioActivity: PortfolioActivity[] = [
     valueSol: 3.62,
     signature: '9pLsPortfolioTransferPlaceholder4Vn2',
     timestamp: '2026-04-28T04:18:00Z',
+  },
+];
+
+export const marketplaceStats: MarketplaceStat[] = [
+  {
+    id: 'marketplace-stat-me',
+    marketplace: 'Magic Eden',
+    shortName: 'ME',
+    coverage: 'Primary listings and bid-side liquidity',
+    volumeSol: 1284.6,
+    salesCount: 642,
+    listingCount: 8120,
+    averageSaleSol: 2,
+    floorDelta: 3.8,
+    share: 39.1,
+  },
+  {
+    id: 'marketplace-stat-tensor',
+    marketplace: 'Tensor',
+    shortName: 'TN',
+    coverage: 'Pro-market listings and sweep activity',
+    volumeSol: 1476.2,
+    salesCount: 714,
+    listingCount: 6924,
+    averageSaleSol: 2.07,
+    floorDelta: 5.2,
+    share: 44.9,
+  },
+  {
+    id: 'marketplace-stat-exchange-art',
+    marketplace: 'Exchange.Art',
+    shortName: 'EA',
+    coverage: '1/1 art and curated drops',
+    volumeSol: 214.8,
+    salesCount: 91,
+    listingCount: 846,
+    averageSaleSol: 2.36,
+    floorDelta: -1.4,
+    share: 6.5,
+  },
+  {
+    id: 'marketplace-stat-okx',
+    marketplace: 'OKX NFT',
+    shortName: 'OK',
+    coverage: 'Aggregator orders and wallet-native listings',
+    volumeSol: 182.7,
+    salesCount: 76,
+    listingCount: 1315,
+    averageSaleSol: 2.4,
+    floorDelta: 0.9,
+    share: 5.6,
+  },
+  {
+    id: 'marketplace-stat-hyperspace',
+    marketplace: 'Hyperspace',
+    shortName: 'HY',
+    coverage: 'Legacy marketplace routing and long-tail listings',
+    volumeSol: 129.4,
+    salesCount: 58,
+    listingCount: 1215,
+    averageSaleSol: 2.23,
+    floorDelta: -0.6,
+    share: 3.9,
+  },
+];
+
+export const marketplaceMetrics: PulseMetric[] = [
+  {
+    label: 'Sales volume',
+    value: '3,287.7 SOL',
+    delta: '+12.8% 24H',
+    status: 'positive',
+  },
+  {
+    label: 'Listed NFTs',
+    value: '18,420',
+    delta: '+6.4% 24H',
+    status: 'live',
+  },
+  {
+    label: 'Marketplace spread',
+    value: '2.6%',
+    delta: 'median floor gap',
+    status: 'neutral',
+  },
+  {
+    label: 'Active platforms',
+    value: '5',
+    delta: 'ME, Tensor, etc',
+    status: 'neutral',
+  },
+];
+
+export const marketplaceVolumeSeries: ChartSeriesPoint[] = [
+  { detail: 'Late UTC rollover', label: '00:00', value: 146.2 },
+  { detail: 'Magic Eden floor sweeps', label: '02:00', value: 188.4 },
+  { detail: 'Tensor pro-market activity', label: '04:00', value: 219.7 },
+  { detail: 'Quiet overnight window', label: '06:00', value: 164.5 },
+  { detail: 'Collection bid fills', label: '08:00', value: 241.8 },
+  { detail: 'Primary listing churn', label: '10:00', value: 286.6 },
+  { detail: 'Midday sweep cluster', label: '12:00', value: 309.3 },
+  { detail: 'Highest 2H volume bucket', label: '14:00', value: 402.7 },
+  { detail: 'Tensor and ME routed sales', label: '16:00', value: 371.2 },
+  { detail: 'OKX aggregator fills', label: '18:00', value: 316.9 },
+  { detail: 'Evening marketplace rotation', label: '20:00', value: 341.7 },
+  { detail: 'Late-session volume', label: '22:00', value: 298.7 },
+];
+
+export const marketplaceListingSeries: ChartSeriesPoint[] = [
+  { detail: 'At or near collection floor', label: 'Floor', value: 2436 },
+  { detail: 'Within 5% of floor', label: '+5%', value: 3188 },
+  { detail: 'Within 10% of floor', label: '+10%', value: 3520 },
+  { detail: 'Within 15% of floor', label: '+15%', value: 2894 },
+  { detail: 'Within 25% of floor', label: '+25%', value: 2416 },
+  { detail: 'Within 50% of floor', label: '+50%', value: 1980 },
+  { detail: 'Long-tail asks above 50%', label: '>50%', value: 1986 },
+];
+
+export const marketplaceCollectionStats: MarketplaceCollectionStat[] = [
+  {
+    id: 'collection-stat-mad-lads',
+    collection: 'Mad Lads',
+    topMarketplace: 'Tensor',
+    floorSol: 54.2,
+    listingCount: 318,
+    salesCount: 68,
+    volumeSol: 812.4,
+    spread: 1.8,
+  },
+  {
+    id: 'collection-stat-claynosaurz',
+    collection: 'Claynosaurz',
+    topMarketplace: 'Magic Eden',
+    floorSol: 22.95,
+    listingCount: 241,
+    salesCount: 44,
+    volumeSol: 356.7,
+    spread: -2.4,
+  },
+  {
+    id: 'collection-stat-smb',
+    collection: 'Solana Monkey Business',
+    topMarketplace: 'Tensor',
+    floorSol: 31.4,
+    listingCount: 129,
+    salesCount: 23,
+    volumeSol: 284.3,
+    spread: 5.7,
+  },
+  {
+    id: 'collection-stat-famous-fox',
+    collection: 'Famous Fox Federation',
+    topMarketplace: 'Magic Eden',
+    floorSol: 8.75,
+    listingCount: 474,
+    salesCount: 91,
+    volumeSol: 238.8,
+    spread: 4.2,
+  },
+  {
+    id: 'collection-stat-y00ts',
+    collection: 'y00ts',
+    topMarketplace: 'OKX NFT',
+    floorSol: 5.48,
+    listingCount: 386,
+    salesCount: 52,
+    volumeSol: 147.9,
+    spread: 0.6,
   },
 ];
 

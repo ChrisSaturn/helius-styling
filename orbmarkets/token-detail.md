@@ -45,7 +45,7 @@ The token detail screen lets users inspect one asset, verify token identity, com
 - Border: summary stats, KPI panels, chart frame, table rows, tabs, and pagination use low-contrast 1 px charcoal dividers.
 - Typography: IBM Plex Sans and Geist Mono remain the observed type families. The token title and major KPI values are bold sans; addresses, chips, axes, and table labels skew technical and compact.
 - Iconography: thin outline icons for favorite, copy, social links, chart mode, sort, and pagination; token and market logos are asset images.
-- Radius: compact controls use small radii. The token logo is circular; the score badge keeps the angular hex shape from the market table.
+- Corner treatment: compact controls, chart controls, pagination, and panel frames use 0 px square corners. The token logo remains a circular asset; the score badge keeps the angular hex shape from the market table.
 - Spacing: the first viewport is vertically stacked and dense, with large whitespace reserved only for the chart plot area.
 - Density: values are large enough for scan priority, but surrounding labels and controls stay compact.
 - Chart gap: Paper captured the chart frame and controls but omitted the rendered chart content. The supplied screenshot confirms the missing chart should include a red 24H price line, faint horizontal and vertical grid, right y-axis values, bottom time labels, active `24H` segment, and `Live` chip.

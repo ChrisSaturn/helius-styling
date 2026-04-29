@@ -68,6 +68,12 @@ export interface PortfolioActivity {
   timestamp: string;
 }
 
+export interface ChartSeriesPoint {
+  detail?: string;
+  label: string;
+  value: number;
+}
+
 export interface PortfolioProfile {
   displayName: string;
   wallet: string;
