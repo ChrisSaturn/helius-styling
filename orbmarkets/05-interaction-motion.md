@@ -84,6 +84,7 @@ This section documents intentional prototype behavior only; it is not production
 | Me portfolio | `Me` switches to a portfolio view; the brand button returns to the Pulse monitor. | URL routing, authenticated state, wallet switching, privacy states, and persistence. |
 | Stats marketplace view | `Stats` replaces the prototype `Network` nav entry and shows only NFT marketplace KPIs, tokenized Recharts marketplace volume and listing-depth graphs, visual summary panels, listing-platform comparison, and collection routing. | URL routing, live marketplace/DAS/aggregator sources, source attribution, stale indicators, filters, and partial data states. |
 | Settings popup | Settings opens an anchored placeholder dialog with grouped controls and closes through Escape, close, Done, route change, or brand navigation. | Real preference persistence, outside-click behavior, focus trap, focus return, saved state, and account-scoped settings. |
+| Private Payments hero | The Eclipse prototype uses a decorative ASCII frame sequence behind the sparse hero, with Paper holding a static first-frame preview. | Whether the production route should keep the animation, lower the frame rate, or swap to a brand-approved generated asset. |
 
 Refined interaction direction:
 
@@ -92,12 +93,13 @@ Refined interaction direction:
 - Mock-feed updates should use one timed source, functional state updates, capped visible rows, and derived metrics. They should not steal focus, resize the tables, or imply real stream connectivity.
 - Incoming mock rows can use a short accent fill, left rail, and content slide/fade to signal new data. KPI cells can use a short refresh pulse. Keep these animations CSS-only, under roughly 1.5 seconds, and disabled under reduced-motion preferences.
 - Marketplace stats updates should follow the monitor table rules: refresh metric text, Recharts volume/depth buckets, visual summary bars, platform rows, and collection routing rows without changing KPI count, chart height, row height, column width, scroll position, or focus.
-- Recharts hover/focus feedback should stay quiet: use the custom black tooltip, subtle accent cursor, and active bar contrast. Do not add pulsing chart bars unless the state represents a real live update and reduced-motion behavior is defined.
+- Recharts hover/focus feedback should stay quiet: use the custom black tooltip, neutral cursor fill, and primary-bar contrast. Do not add pulsing chart bars; live updates should replace values without introducing chart-specific animation unless reduced-motion behavior and data meaning are explicitly defined.
 - Inert NFT, account, signature, and listing links preserve full values through accessible labels and title text while rendering truncated table text.
 - Collection names and main row clickables should stay in the White or primary text role even when the link is inert in the prototype; muted text is for supporting identifiers and metadata.
 - The active `Me` and `Stats` nav states use `aria-current="page"` and selected text/fill treatment rather than an orange outline.
 - The settings trigger exposes `aria-expanded`/`aria-controls`, renders a labelled dialog while open, and uses selected icon/text fill or quiet neutral active styling unless keyboard focus requires a stronger ring.
 - Settings segment choices such as `Dark` and `System` should behave as flat buttons in one group; avoid extra reveal motion or nested active containers for each choice.
+- Private Payments hero motion can be more expressive than dense explorer views because it lives in a sparse marketing first viewport. Keep it decorative, `aria-hidden`, low opacity, reduced-motion aware, and out of React state so it never shifts layout or steals focus.
 
 ## Motion Guidelines
 

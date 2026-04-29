@@ -80,9 +80,9 @@ Treat these as implementation candidates until live CSS confirms exact values.
 | Color | `color.chart.axisText` | Right y-axis and bottom x-axis labels. |
 | Color | `color.chart.line.negative` | Red token price line when selected period is down. |
 | Color | `color.chart.frame.accent` | Chart corner brackets and active timeframe border. |
-| Color | `color.chart.bar.primary` | Pulse Recharts marketplace volume bars. |
-| Color | `color.chart.bar.secondary` | Pulse Recharts listing-depth bars. |
-| Color | `color.chart.cursor` | Recharts hover/focus cursor fill. |
+| Color | `color.chart.bar.primary` | Pulse Recharts marketplace volume and listing-depth bars. |
+| Color | `color.chart.bar.secondary` | Reserved for inactive or comparison chart bars, not default Stats graph series. |
+| Color | `color.chart.cursor` | Neutral Recharts hover/focus cursor fill. |
 | Color | `color.chart.tooltip.surface` | Recharts tooltip body. |
 | Size | `size.popup.aiAnalysis.width.compact` | 380 px AI analysis popup reference width. |
 | Size | `size.popup.aiAnalysis.height.idle` | 331 px AI analysis popup idle reference height. |
@@ -124,8 +124,9 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - Use Recharts for Pulse `Stats` marketplace volume and listing-depth charts through a small adapter component rather than hand-rolled SVG geometry in the page component.
 - Keep chart data normalized before rendering. The current adapter expects labelled `{ label, value, detail }` buckets and caller-provided formatters for axes, tooltips, and summary text.
 - Style Recharts through Orb tokens: `--color-chart-grid`, `--color-chart-baseline`, `--color-chart-axis-text`, `--color-chart-bar`, `--color-chart-bar-hover`, `--color-chart-cursor`, and `--color-chart-tooltip-bg`.
-- Do not use generic `--chart-1`/`--chart-2`, rounded bar defaults, gradients, chart-card wrappers, or external tooltip themes unless those values are explicitly mapped back to Orb chart roles.
-- Use `ResponsiveContainer` inside a fixed-height panel, right-side `YAxis`, bottom `XAxis`, horizontal grid only, square bars, custom black tooltip, and `accessibilityLayer`.
+- Do not use generic `--chart-1`/`--chart-2`, `hsl(var(--chart-1))` fills, rounded bar defaults, gradients, chart-card wrappers, animated pulse bars, or external tooltip themes unless those values are explicitly mapped back to Orb chart roles.
+- Use `ResponsiveContainer` inside a fixed-height panel, right-side `YAxis`, bottom `XAxis`, horizontal grid only, explicit square bar sizes per chart variant, custom black tooltip, and `accessibilityLayer`.
+- Keep the default Recharts interaction minimal: neutral cursor fill, primary white bars, no series entry animation, and hover/focus emphasis through opacity or the same primary bar token rather than orange.
 - Preserve a hidden chart summary and stable lazy-loading fallback so chart loading, empty data, or source errors do not collapse the Stats band.
 - Lazy-load heavy Recharts renderers from the feature view that needs them. The default Pulse monitor route should not import Recharts until the `Stats` chart band renders.
 
@@ -155,6 +156,17 @@ Treat these as implementation candidates until live CSS confirms exact values.
 - In the local `/pulse` prototype, the observed `Network` slot is intentionally used as a `Stats` route for mock NFT marketplace stats. It borrows compact panel styling from the captured network stats hierarchy without rendering network data.
 - Reserve accessible names for search, copy/share utility, settings, and any network selector. Mark active route or selected network semantically.
 - Treat menu panels, auth menus, search suggestions, and mobile behavior as unresolved until captured from production.
+
+## Private Payments Hero Background Contract
+
+Prototype source: `OM-PROT-005-private-payments-api`; not production evidence.
+
+- Use the supplied `eclipse (private-payments)/animation.js` frame source as the canonical local animation input. Keep `ascii-animation.html` as the standalone source preview.
+- Load the frame source as a Vite URL asset and fetch it from the hero background component. Do not import the 431 KB frame list directly into React render state.
+- Animate the decorative `<pre>` by mutating `textContent` inside `requestAnimationFrame`; cap the cadence to the source 24 fps and cancel the frame loop on unmount.
+- Mark the background `aria-hidden="true"` and keep all existing hero label, headline, body copy, command, and chip content above it in the stacking order.
+- Respect `prefers-reduced-motion: reduce` by displaying the first loaded frame without advancing frames.
+- Use the generated `public/ascii-hero-frame.svg` only as the Paper/static design preview. Runtime code should continue to use the JS frame source so Paper and implementation stay traceable to the same animation.
 
 ## Settings Popup Component Contract
 
@@ -235,7 +247,7 @@ Current `/pulse` implementation alignment:
 - `pulse/src/App.tsx` also includes the placeholder settings popup with open state, Escape-to-close, active trigger semantics, inert segmented controls, and a labelled toggle.
 - `pulse/index.html` links the Pulse favicon set from `/winniepoo-mert/favicon_io/`; Vite serves the copied bundle from `pulse/public/winniepoo-mert/favicon_io`, including the `.ico`, PNG sizes, Apple touch icon, and manifest with Pulse app names and black theme/background colors.
 - `pulse/src/pulseData.ts` owns the mock feed and stats boundaries through `createInitialPulseFeed`, `createNextPulseFeed`, `buildPulseMetrics`, deterministic generated row factories, marketplace stats placeholders, 2-hour marketplace-volume buckets, floor-band listing-depth buckets, collection routing placeholders, a fixed visible-row cap, and the 4.5 second refresh constant so future stream, marketplace, DAS, and aggregator sources can replace mock data without rewriting row components.
-- `pulse/src/styles.css` maps the prototype to Orb tokens with the 1480 px shared shell, 18/14/12 px responsive gutters, 69 px desktop header, 61 px search rail, square 0 px visible UI corners, compact title/status header, profile summary band, continuous Paper-aligned marketplace graph and summary bands, tokenized Recharts surfaces/tooltips, marketplace stats tables, 64 px monitor rows, fixed 40 px neutral NFT/platform thumbnails, anchored settings popup, tokenized hover/focus/active states, CSS-only incoming row and metric refresh animations, `content-visibility` on table panels only, and reduced-motion handling.
+- `pulse/src/styles.css` maps the prototype to Orb tokens with the 1480 px shared shell, 18/14/12 px responsive gutters, 69 px desktop header, 61 px search rail, square 0 px visible UI corners, compact title/status header, profile summary band, continuous Paper-aligned marketplace graph and summary bands, neutral tokenized Recharts surfaces/tooltips, marketplace stats tables, 64 px monitor rows, fixed 40 px neutral NFT/platform thumbnails, anchored settings popup, tokenized hover/focus/active states, CSS-only incoming row and metric refresh animations outside chart bars, `content-visibility` on table panels only, and reduced-motion handling.
 
 ## Portfolio Implementation Rules
 
@@ -260,7 +272,7 @@ Visual source: `OM-008-network-stats`; local alignment source: `OM-PROT-004-stat
 - Model marketplace stats with local types before integration: platform rows should include marketplace name, short label, source coverage, SOL volume, sales count, listing count, average sale, floor movement, and share; collection rows should include collection, top marketplace, floor, listings, sales, volume, and spread.
 - Treat local marketplace data as placeholder until marketplace APIs, DAS queries, indexer output, or aggregator sources are confirmed. Do not infer marketplace stats from the mock Pulse event feed.
 - Use the captured network stats visual language only as styling reference: shallow bordered bands, uppercase section titles, optional metric, info icon, and the three-line horizontal rule cluster. Keep the local Stats view scoped to NFT marketplace data.
-- Render local NFT marketplace graph fixtures through the shared Recharts adapter with grid lines, right-axis labels, bottom bucket labels, custom tooltip, `accessibilityLayer`, and accessible summaries. The volume graph should use 2-hour SOL-volume buckets; the listing-depth graph should use floor-band inventory buckets rather than another generic time line. Chart panels should follow the `3RV-0` sizing relationship: one continuous two-column band, 298 px panel height, shared outer border, vertical divider, large header metric derived from the plotted buckets, sparse body field, and footer metadata anchored to the lower edge. Keep chart panels stable when the renderer is lazy-loading, missing, loading, or no-data, and browser-QA any future production chart layer.
+- Render local NFT marketplace graph fixtures through the shared Recharts adapter with grid lines, right-axis labels, bottom bucket labels, custom tooltip, `accessibilityLayer`, and accessible summaries. The volume graph should use exactly 12 two-hour SOL-volume buckets for the 24H view; the listing-depth graph should use floor-band inventory buckets rather than another generic time line. Chart panels should follow the `3RV-0` sizing relationship: one continuous two-column band, 298 px panel height, shared outer border, vertical divider, large header metric derived from the plotted buckets, sparse body field, and footer metadata anchored to the lower edge. Keep chart panels stable when the renderer is lazy-loading, missing, loading, or no-data, and browser-QA any future production chart layer.
 - Render marketplace visual summaries with the `3Y3-0` distribution model: one continuous three-column band, shared outer border, vertical dividers, no card gaps, dominant first-panel value, compact middle-list content, and thicker square bars in the third panel.
 - Use fixed table layouts for marketplace overview and collection routing. Preserve row height, platform/collection identity width, numeric alignment, percentage formatting, and horizontal overflow during future refreshes.
 - Preserve native table semantics for marketplace and collection tables; stacked identity, value, and trend content must live inside inner wrappers.
